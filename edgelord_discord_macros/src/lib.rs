@@ -18,7 +18,6 @@ use crate::command::{CommandMeta, parse_command};
 - `i18n_names`: command i18n names HashMap generate function name. () -> HashMap<&'static str, String>. See https://discord.com/developers/docs/reference#locales
 - `i18n_descriptions`: command i18n descriptions HashMap generate function name. () -> HashMap<&'static str, String>.
 
-
 **/
 
 
@@ -37,4 +36,3 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
         Err(e) => e.write_errors().into(),
     }
 }
-

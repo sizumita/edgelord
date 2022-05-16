@@ -52,7 +52,7 @@ pub(crate) fn parse_command(
     let function_name = std::mem::replace(&mut func.sig.ident, syn::parse_quote! { inner });
     let visibility = &func.vis;
 
-    let options = parse_options(func.sig.inputs.clone())?;
+    let options = parse_options(&mut func.sig.inputs)?;
     let action = parse_action(options);
 
     Ok(TokenStream::from(quote::quote! {
@@ -70,7 +70,7 @@ pub(crate) fn parse_command(
     }))
 }
 
-pub(crate) fn parse_options(mut options: Punctuated<FnArg, Comma>) -> Result<Vec<CommandOption>, darling::Error> {
+pub(crate) fn parse_options(options: &mut Punctuated<FnArg, Comma>) -> Result<Vec<CommandOption>, darling::Error> {
     let mut parsed_options = Vec::new();
 
     for option in options.iter_mut().skip(1) {
@@ -125,9 +125,8 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
 
     quote::quote! {
         |ctx, _| Box::pin(async move {
-            // inner(ctx.clone(), #( #args, )*)
-            //     .await
-            ::worker::Response::ok("ok")
+            inner(ctx.clone(), #( #args, )*)
+                .await
         })
     }
 }
