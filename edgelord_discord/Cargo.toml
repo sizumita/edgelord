@@ -12,3 +12,4 @@ worker = "0.0.9"
 edgelord_discord_macros = { path = "../edgelord_discord_macros", version = "0.0.1" }
 futures = "0.3.21"
 twilight-model = "0.11.0"
+async-trait = "0.1.53"

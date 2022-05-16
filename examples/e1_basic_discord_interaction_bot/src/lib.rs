@@ -1,13 +1,17 @@
 use std::collections::HashMap;
-use edgelord_discord::{CommandHandler, command, Context, model, InteractionResponse};
+use edgelord_discord::{CommandHandler, command, ChatInputCommandContext, InteractionResponse};
 use worker::*;
 
 
 #[event(fetch)]
 pub async fn fetch(req: Request, env: Env, ctx: worker::Context) -> Result<Response> {
     let handler = CommandHandler::builder()
-        .command("help")
-        .build();
+        .command(help_command)
+        .build(
+            &*std::env::var("DISCORD_BOT_TOKEN").expect("discord bot token is not found"),
+            &*std::env::var("APPLICATION_ID").expect("application id is not found"),
+            &*std::env::var("APPLICATION_PUBLIC_KEY").expect("application public key is not found"),
+        );
     handler.process(req, env, ctx).await
 }
 
@@ -23,17 +27,8 @@ fn names() -> HashMap<&'static str, String> {
     i18n_names = "names",
 )]
 pub async fn help_command(
-    ctx: Context,
-    #[description = "this is abc"]
-    abc: String) -> InteractionResponse {
-    ctx.message("abc")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::help_command;
-    #[test]
-    fn a() {
-        println!("{:?}", help_command().i18n_names);
-    }
+    ctx: ChatInputCommandContext,
+    #[description = "this is text what you want to show"]
+    text: String) -> InteractionResponse {
+    ctx.message(&*text)
 }

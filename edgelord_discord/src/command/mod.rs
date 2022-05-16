@@ -7,6 +7,9 @@ pub use context::*;
 
 type I18nMap = Option<HashMap<&'static str, String>>;
 
+/**
+Discord Chat Input Command Structure.
+ **/
 #[derive(Clone)]
 pub struct Command {
     pub name: String,
@@ -17,7 +20,7 @@ pub struct Command {
     pub options: Vec<CommandOption>,
 
     pub action: for<'a> fn(
-        Context,
+        ChatInputCommandContext,
         name: &'a str,
     ) -> BoxFuture<'a, worker::Result<worker::Response>>,
 }

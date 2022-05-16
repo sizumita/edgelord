@@ -1,13 +1,15 @@
+use twilight_model::application::interaction::{ApplicationCommand};
 use twilight_model::channel::message::MessageFlags;
-use crate::InteractionResponse;
+use crate::{Command, InteractionResponse};
 use twilight_model::http::interaction::{InteractionResponseType, InteractionResponseData};
 
 #[derive(Clone)]
-pub struct Context {
-
+pub struct ChatInputCommandContext {
+    command: Command,
+    interaction: ApplicationCommand,
 }
 
-impl Context {
+impl ChatInputCommandContext {
     pub fn get_option<T>(&self, name: &str) -> T {
         todo!()
     }

@@ -1,43 +1,24 @@
+//! # edgelord_discord
+//!
+//! `edgelord_discord` is a discord http interaction bot framework for cloudflare workers.
+//!
+//!
+//!
+//!
+
 mod command;
+pub mod http;
+mod handler;
+mod builder;
 
 use std::collections::HashMap;
 
 pub use edgelord_discord_macros::*;
-pub use command::*;
 pub use twilight_model as model;
+pub use async_trait::async_trait;
+
+pub use command::*;
+pub use handler::*;
+pub use builder::*;
 
 pub type InteractionResponse = worker::Result<worker::Response>;
-
-pub struct CommandHandler {
-
-}
-
-pub struct CommandHandlerBuilder {
-
-}
-
-impl CommandHandler {
-    pub fn builder() -> CommandHandlerBuilder {
-        CommandHandlerBuilder::new()
-    }
-
-    pub async fn process(&self, req: worker::Request, env: worker::Env, ctx: worker::Context) -> worker::Result<worker::Response> {
-        worker::Response::ok("ok")
-    }
-}
-
-impl CommandHandlerBuilder {
-    pub fn new() -> Self {
-        CommandHandlerBuilder {}
-    }
-
-    pub fn command(&mut self, command: &str) -> &mut Self {
-        // TODO: Impl
-        self
-    }
-
-    pub fn build(&mut self) -> CommandHandler {
-        // TODO: Impl
-        CommandHandler {}
-    }
-}
