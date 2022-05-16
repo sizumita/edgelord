@@ -9,7 +9,7 @@ You can use Edgelord to scaffold a basic bot for social networking service.
 
 Edgelord supports previous bot:
 
-- 🚧 discord with command framework
+- 🚧 discord
 - 🚧 slack
 
 Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a foundation to build a bot on.

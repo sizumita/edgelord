@@ -1,10 +1,12 @@
 [package]
 name = "edgelord_discord"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["sizumita <contact@sumidora.com>"]
+description = "A discord interaction bot framework for cloudflare workers"
+license = "MIT"
+repository = "https://github.com/sizumita/edgelord"
 
 [dependencies]
 worker = "0.0.9"
-edgelord_discord_macros = { path = "../edgelord_discord_macros", version = "*" }
+edgelord_discord_macros = { path = "../edgelord_discord_macros", version = "0.0.1" }

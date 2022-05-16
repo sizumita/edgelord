@@ -1,8 +1,11 @@
 [package]
 name = "edgelord_discord_macros"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
+authors = ["sizumita <contact@sumidora.com>"]
+description = "Internal macros for edgelord_discord"
 license = "MIT"
+repository = "https://github.com/sizumita/edgelord"
 
 [lib]
 proc-macro = true
