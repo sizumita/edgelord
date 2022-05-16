@@ -2,7 +2,7 @@ use twilight_model::channel::message::MessageFlags;
 use crate::InteractionResponse;
 use twilight_model::http::interaction::{InteractionResponseType, InteractionResponseData};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Context {
 
 }

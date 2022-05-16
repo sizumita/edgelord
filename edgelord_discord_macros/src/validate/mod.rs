@@ -8,5 +8,6 @@ pub(crate) fn validate_option(meta: &OptionMeta, span: Span) -> Result<(), darli
     if meta.description.len() > 100 {
         return Err(syn::Error::new(span, format!("description length is longer than limit ({} > 100)", meta.description.len())).into());
     }
+    // TODO: name validation
     Ok(())
 }

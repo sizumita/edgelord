@@ -3,7 +3,7 @@ mod command;
 use std::collections::HashMap;
 
 pub use edgelord_discord_macros::*;
-pub use command::{Command, Context};
+pub use command::*;
 pub use twilight_model as model;
 
 pub type InteractionResponse = worker::Result<worker::Response>;
