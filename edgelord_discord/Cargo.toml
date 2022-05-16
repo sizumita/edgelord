@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 worker = "0.0.9"
+edgelord_discord_macros = { path = "../edgelord_discord_macros", version = "*" }

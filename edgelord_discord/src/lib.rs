@@ -1,4 +1,10 @@
+mod command;
+
+use std::collections::HashMap;
 use worker::{Request, Env, Context, Response};
+
+pub use edgelord_discord_macros::*;
+pub use command::*;
 
 pub struct CommandHandler {
 

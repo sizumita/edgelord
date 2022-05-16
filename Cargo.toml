@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "edgelord_discord",
+    "edgelord_discord_macros",
     "examples/*"
 ]

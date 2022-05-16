@@ -1,18 +1,18 @@
-# Edgelord
+Edge Computing + chūnibyō = Edgelord ✨👿
 
-Edge Computing + chūnibyō = Edgelord ✨
+# Edgelord
 
 **Edgelord is now working. You can contribute for it.**
 
-Edgelord is a Rust library for cloudflare workers.
-You can use Edgelord to scaffold a basic bot.
+Edgelord is a Rust library for cloudflare workers. 
+You can use Edgelord to scaffold a basic bot for social networking service.
 
 Edgelord supports previous bot:
 
-- 🚧 discord
+- 🚧 discord with command framework
 - 🚧 slack
 
-Since Edgelord is a Light Wrapper, you can use as a foundation to build a bot on.
+Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a foundation to build a bot on.
 
 # Features
 
