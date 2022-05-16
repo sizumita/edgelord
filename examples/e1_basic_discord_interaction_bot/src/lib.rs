@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use edgelord_discord::{CommandHandler, command};
+use edgelord_discord::{CommandHandler, command, Context, model, InteractionResponse};
 use worker::*;
 
 
@@ -22,6 +22,18 @@ fn names() -> HashMap<&'static str, String> {
     description = "help command for newer.",
     i18n_names = "names",
 )]
-pub async fn help_command() {
+pub async fn help_command(
+    ctx: Context,
+    #[description = "this is abc"]
+    abc: String) -> InteractionResponse {
+    ctx.message("abc")
+}
 
+#[cfg(test)]
+mod tests {
+    use super::help_command;
+    #[test]
+    fn a() {
+        println!("{:?}", help_command().i18n_names);
+    }
 }

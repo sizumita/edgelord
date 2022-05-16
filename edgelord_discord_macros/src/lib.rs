@@ -1,4 +1,6 @@
+#[macro_use]
 mod command;
+mod validate;
 
 use proc_macro::TokenStream;
 use darling::FromMeta;
@@ -9,7 +11,7 @@ use crate::command::{CommandMeta, parse_command};
 
 # Command Metadata Macro
 
-## Arguments
+## Command Arguments
 
 - `name`: command default name
 - `description`: command default description
@@ -35,3 +37,4 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
         Err(e) => e.write_errors().into(),
     }
 }
+

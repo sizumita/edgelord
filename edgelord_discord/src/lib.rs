@@ -1,10 +1,12 @@
 mod command;
 
 use std::collections::HashMap;
-use worker::{Request, Env, Context, Response};
 
 pub use edgelord_discord_macros::*;
-pub use command::*;
+pub use command::{Command, Context};
+pub use twilight_model as model;
+
+pub type InteractionResponse = worker::Result<worker::Response>;
 
 pub struct CommandHandler {
 
@@ -19,8 +21,8 @@ impl CommandHandler {
         CommandHandlerBuilder::new()
     }
 
-    pub async fn process(&self, req: Request, env: Env, ctx: Context) -> worker::Result<Response> {
-        Response::ok("ok")
+    pub async fn process(&self, req: worker::Request, env: worker::Env, ctx: worker::Context) -> worker::Result<worker::Response> {
+        worker::Response::ok("ok")
     }
 }
 

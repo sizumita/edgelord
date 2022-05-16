@@ -22,9 +22,10 @@ Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a found
 
 ## 🚧 Discord Bot
 
-You can use `edgelord_discord` for creating http interaction bot.
+`edgelord_discord` is a fast, light weight, powerful discord http interaction bot framework.
+It provides type safely commands, automatically publish system.
 
-See /examples/e1_basic_discord_interaction_bot for example
+See /examples/e1_basic_discord_interaction_bot for example.
 
 # Contribution
 
