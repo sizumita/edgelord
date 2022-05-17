@@ -1,22 +1,37 @@
+use std::sync::Arc;
 use twilight_model::application::interaction::{ApplicationCommand};
+use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::channel::message::MessageFlags;
 use crate::{Command, InteractionResponse};
 use twilight_model::http::interaction::{InteractionResponseType, InteractionResponseData};
+use worker::{Context, Env};
 
-#[derive(Clone)]
+
 pub struct ChatInputCommandContext {
-    command: Command,
-    interaction: ApplicationCommand,
+    pub interaction: Box<ApplicationCommand>,
+    // env: Env,
+    ctx: Arc<worker::Context>,
 }
 
 impl ChatInputCommandContext {
-    pub fn get_option<T>(&self, name: &str) -> T {
-        todo!("a")
+    pub fn new(interaction: Box<ApplicationCommand>, env: Env, ctx: worker::Context) -> Self {
+        Self {
+            interaction,
+            // env,
+            ctx: Arc::new(ctx),
+        }
+    }
+
+    pub fn get_option<T: std::convert::From<String>>(interaction: Box<ApplicationCommand>, name: &str) -> T {
+        match interaction.data.options.iter().find(|x| x.name == name.to_string()).unwrap().clone().value {
+            CommandOptionValue::String(value) => value.into(),
+            _ => unreachable!()
+        }
     }
 
     pub fn message(&self, message: &str) -> InteractionResponse {
         worker::Response::from_json(&twilight_model::http::interaction::InteractionResponse {
-            kind: InteractionResponseType::Pong,
+            kind: InteractionResponseType::ChannelMessageWithSource,
             data: Some(InteractionResponseData {
                 allowed_mentions: None,
                 attachments: None,

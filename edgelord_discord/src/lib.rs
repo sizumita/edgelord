@@ -6,6 +6,8 @@
 //!
 //!
 
+extern crate core;
+
 mod command;
 pub mod http;
 mod handler;

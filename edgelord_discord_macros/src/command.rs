@@ -53,7 +53,7 @@ pub(crate) fn parse_command(
     let action = parse_action(options);
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name() -> ::edgelord::discord::Command {
+        #visibility fn #function_name<'a>() -> ::edgelord::discord::Command<'a> {
             #func
 
             ::edgelord::discord::Command {
@@ -123,16 +123,12 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
                 };
                 let t = option.t.clone();
                 quote::quote! {
-                    ctx.get_option::<#t>(#name)
+                    ::edgelord::discord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
                 }
             }
         ).collect::<Vec<_>>();
-
     quote::quote! {
-        |ctx, _| Box::pin(async move {
-            inner(ctx.clone(), #( #args, )*)
-                .await
-        })
+        ::std::rc::Rc::new(move |ctx, interaction| Box::pin(inner(ctx, #( #args, )*)))
     }
 }
 

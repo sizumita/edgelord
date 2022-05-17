@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::Arc;
 use edgelord::discord::{InteractionHandler, command, ChatInputCommandContext, InteractionResponse};
 use worker::*;
 use edgelord::discord::i18n::Locales;
@@ -12,7 +13,7 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
 
     router
         .post_async(
-            "/interaction", |req, ctx| async move {
+            "/", |req, ctx| async move {
                 let RouteContext {env, data, ..} = ctx;
                 let handler = InteractionHandler::builder()
                     .command(help_command)
@@ -40,7 +41,6 @@ fn names() -> HashMap<Locales, String> {
 )]
 pub async fn help_command(
     ctx: ChatInputCommandContext,
-    #[description = "this is text what you want to show"]
-    text: String) -> InteractionResponse {
-    ctx.message(&*text)
+    ) -> InteractionResponse {
+    ctx.message("abc")
 }

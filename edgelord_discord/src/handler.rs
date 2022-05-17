@@ -1,20 +1,22 @@
+use std::sync::Arc;
 use ed25519_dalek::{PublicKey, Signature, Verifier};
-use twilight_model::application::interaction::Interaction;
+use twilight_model::application::command::CommandType;
+use twilight_model::application::interaction::{Interaction, InteractionType};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
 use worker::{console_error, console_log, Response};
-use crate::{Command, CommandHandlerBuilder, http};
+use crate::{ChatInputCommandContext, Command, CommandHandlerBuilder, http};
 
 /**
 A Discord Interaction Handler.
 Parse Interaction and dispatch commands.
 **/
-pub struct InteractionHandler {
-    pub commands: Vec<Command>,
+pub struct InteractionHandler<'a> {
+    pub commands: Vec<Command<'a>>,
     pub http: http::HttpClient,
     pub public_key: PublicKey,
 }
 
-impl InteractionHandler {
+impl<'a> InteractionHandler<'a> {
     /**
     Returns [`CommandHandlerBuilder`].
 
@@ -26,7 +28,7 @@ impl InteractionHandler {
     ```
 
     **/
-    pub fn builder() -> CommandHandlerBuilder {
+    pub fn builder() -> CommandHandlerBuilder<'a> {
         CommandHandlerBuilder::new()
     }
 
@@ -41,13 +43,38 @@ impl InteractionHandler {
         let interaction = req.json::<Interaction>().await?;
 
         match interaction {
-            Interaction::Ping(ping) => {
+            Interaction::Ping(_ping) => {
                 worker::Response::from_json(
                     &InteractionResponse {
                         kind: InteractionResponseType::Pong,
                         data: None
                     }
                 )
+            }
+            Interaction::ApplicationCommand(command) => {
+                match command.kind.clone() {
+                    InteractionType::ApplicationCommand => {
+                        match self.get_command(command.data.name.clone()) {
+                            None => {
+                                console_error!("command not found");
+                                panic!("command not found");
+                            }
+                            Some(cmd) => {
+                                let cmd_ctx = ChatInputCommandContext::new(
+                                    command.clone(),
+                                    env,
+                                    ctx,
+                                );
+                                console_log!("invoke");
+                                return cmd.invoke(cmd_ctx, command).await;
+                            }
+                        }
+
+                    }
+                    _ => {
+                        unreachable!()
+                    }
+                }
             }
             _ => worker::Response::ok("ok")
         }
@@ -66,5 +93,9 @@ impl InteractionHandler {
         message.append(&mut req.clone()?.bytes().await?);
 
         self.public_key.verify(message.as_slice(), &signature).map_err(|e| e.into())
+    }
+
+    pub fn get_command(&self, name: String) -> Option<Command<'a>> {
+        self.commands.iter().find(|cmd| cmd.name == name).and_then(|x| Some(x.clone()))
     }
 }

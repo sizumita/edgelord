@@ -4,13 +4,13 @@ use crate::{Command, InteractionHandler, http};
 /**
 A builder for [`InteractionHandler`].
  **/
-pub struct CommandHandlerBuilder {
-    commands: Vec<Command>,
+pub struct CommandHandlerBuilder<'a> {
+    commands: Vec<Command<'a>>,
     public_key: Option<String>,
 }
 
 
-impl CommandHandlerBuilder {
+impl<'a> CommandHandlerBuilder<'a> {
     pub fn new() -> Self {
         CommandHandlerBuilder {
             commands: vec![],
@@ -22,7 +22,7 @@ impl CommandHandlerBuilder {
     Register command for [`InteractionHandler`].
     You should create [`Command`] with `command` macro.
     **/
-    pub fn command(&mut self, func: fn() -> Command) -> &mut Self {
+    pub fn command(&mut self, func: fn() -> Command<'a>) -> &mut Self {
         self.commands.push(func());
         self
     }
@@ -40,7 +40,7 @@ impl CommandHandlerBuilder {
     /**
     Build and return [`InteractionHandler`].
     **/
-    pub fn build(&mut self, token: &str, application_id: &str) -> Result<InteractionHandler, Box<dyn std::error::Error>> {
+    pub fn build(&mut self, token: &str, application_id: &str) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
         Ok(
             InteractionHandler {
                 commands: self.commands.clone(),
