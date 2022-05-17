@@ -53,10 +53,10 @@ pub(crate) fn parse_command(
     let action = parse_action(options);
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name() -> ::edgelord_discord::Command {
+        #visibility fn #function_name() -> ::edgelord::discord::Command {
             #func
 
-            ::edgelord_discord::Command {
+            ::edgelord::discord::Command {
                 name: #command_name.to_string(),
                 description: #description.to_string(),
                 i18n_names: #i18n_names,
@@ -143,7 +143,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let description = option.meta.description.clone();
 
     quote::quote! {
-        ::edgelord_discord::CommandOption {
+        ::edgelord::discord::CommandOption {
             name: #name.to_string(),
             description: #description.to_string(),
             i18n_names: #i18n_names,

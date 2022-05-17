@@ -33,7 +33,7 @@ impl InteractionHandler {
     /**
     Handle Interaction and response.
     **/
-    pub async fn process(&self, mut req: worker::Request, env: worker::Env) -> worker::Result<worker::Response> {
+    pub async fn process(&self, mut req: worker::Request, env: worker::Env, ctx: worker::Context) -> worker::Result<worker::Response> {
         if let Err(err) = self.verify(&req).await {
             console_error!("verify error: {}", err.to_string());
             return Response::error(err.to_string(), 401);

@@ -19,7 +19,7 @@
 //! # Examples
 //!
 //! ```rust
-//! use edgelord_discord::{ChatInputCommandContext, InteractionResponse};
+//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse};
 //!
 //! #[command(name = "help", description = "show help message")]
 //! async fn help_message(ctx: ChatInputCommandContext) -> InteractionResponse {
