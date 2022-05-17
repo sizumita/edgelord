@@ -1,15 +1,20 @@
+use ed25519_dalek::{PublicKey, Signature, Verifier};
+use twilight_model::application::interaction::Interaction;
+use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
+use worker::{console_error, console_log, Response};
 use crate::{Command, CommandHandlerBuilder, http};
 
 /**
 A Discord Interaction Handler.
 Parse Interaction and dispatch commands.
 **/
-pub struct CommandHandler {
+pub struct InteractionHandler {
     pub commands: Vec<Command>,
     pub http: http::HttpClient,
+    pub public_key: PublicKey,
 }
 
-impl CommandHandler {
+impl InteractionHandler {
     /**
     Returns [`CommandHandlerBuilder`].
 
@@ -28,14 +33,41 @@ impl CommandHandler {
     /**
     Handle Interaction and response.
     **/
-    pub async fn process(&self, req: worker::Request, env: worker::Env, ctx: worker::Context) -> worker::Result<worker::Response> {
-        worker::Response::ok("ok")
+    pub async fn process(&self, mut req: worker::Request, env: worker::Env) -> worker::Result<worker::Response> {
+        if let Err(err) = self.verify(&req).await {
+            console_error!("verify error: {}", err.to_string());
+            return Response::error(err.to_string(), 401);
+        }
+        let interaction = req.json::<Interaction>().await?;
+
+        match interaction {
+            Interaction::Ping(ping) => {
+                worker::Response::from_json(
+                    &InteractionResponse {
+                        kind: InteractionResponseType::Pong,
+                        data: None
+                    }
+                )
+            }
+            _ => worker::Response::ok("ok")
+        }
     }
 
     /**
     Verify interaction and return verify result.
     **/
-    pub async fn verify(&self, req: worker::Request) -> bool {
-        todo!()
+    pub async fn verify(&self, mut req: &worker::Request) -> Result<(), Box<dyn std::error::Error>> {
+        console_log!("{:?}", self.public_key);
+        let signature = Signature::from_bytes(
+            &*hex::decode(
+                req.headers().get("X-Signature-Ed25519")?.unwrap()
+            )?
+        )?;
+        let timestamp = req.headers().get("X-Signature-Timestamp")?.unwrap();
+        let body = req.clone()?.text().await?;
+
+        let message = format!("{}{}", timestamp, body);
+
+        self.public_key.verify(message.as_bytes(), &signature).map_err(|e| e.into())
     }
 }

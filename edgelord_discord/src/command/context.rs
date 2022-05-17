@@ -11,7 +11,7 @@ pub struct ChatInputCommandContext {
 
 impl ChatInputCommandContext {
     pub fn get_option<T>(&self, name: &str) -> T {
-        todo!()
+        todo!("a")
     }
 
     pub fn message(&self, message: &str) -> InteractionResponse {

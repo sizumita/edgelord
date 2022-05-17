@@ -13,3 +13,5 @@ edgelord_discord_macros = { path = "../edgelord_discord_macros", version = "0.0.
 futures = "0.3.21"
 twilight-model = "0.11.0"
 async-trait = "0.1.53"
+ed25519-dalek = "1.0.1"
+hex = "0.4.3"

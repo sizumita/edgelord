@@ -1,16 +1,12 @@
 name = "e1_basic_discord_interaction_bot"
-type = "javascript"
 workers_dev = true
 compatibility_date = "2022-05-15"
+main = "build/worker/shim.mjs"
 
 [build]
 command = "cargo install -q worker-build && worker-build --release"
 
-[build.upload]
-dir = "build/worker"
-format = "modules"
-main = "./shim.mjs"
-
-[[build.upload.rules]]
-globs = ["**/*.wasm"]
-type = "CompiledWasm"
+# [secrets]
+# DISCORD_BOT_TOKEN
+# APPLICATION_ID
+# APPLICATION_PUBLIC_KEY
