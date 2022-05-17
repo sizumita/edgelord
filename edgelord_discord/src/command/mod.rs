@@ -1,11 +1,12 @@
 mod context;
+pub mod i18n;
 
 use std::collections::HashMap;
 use futures::future::BoxFuture;
 
 pub use context::*;
 
-type I18nMap = Option<HashMap<&'static str, String>>;
+type I18nMap = Option<HashMap<i18n::Locales, String>>;
 
 /**
 Discord Chat Input Command Structure.

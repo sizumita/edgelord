@@ -20,7 +20,7 @@ impl InteractionHandler {
 
     # Example
 
-    ```rust
+    ```ignore
     let handler = CommandHandler::builder().build("token", "app id", "app public key");
     handler.process(req, env, ctx).await
     ```
