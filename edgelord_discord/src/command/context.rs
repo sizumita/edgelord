@@ -5,11 +5,13 @@ use twilight_model::channel::message::MessageFlags;
 use crate::{Command, InteractionResponse};
 use twilight_model::http::interaction::{InteractionResponseType, InteractionResponseData};
 use worker::{Context, Env};
+use crate::i18n::Locales;
 
 
 pub struct ChatInputCommandContext {
     pub interaction: Box<ApplicationCommand>,
-    // env: Env,
+    pub locale: Locales,
+    pub env: Env,
     ctx: Arc<worker::Context>,
 }
 
@@ -17,7 +19,8 @@ impl ChatInputCommandContext {
     pub fn new(interaction: Box<ApplicationCommand>, env: Env, ctx: worker::Context) -> Self {
         Self {
             interaction,
-            // env,
+            locale: serde_json::from_str::<Locales>(&*interaction.locale).unwrap_or(Locales::EnUS),
+            env,
             ctx: Arc::new(ctx),
         }
     }

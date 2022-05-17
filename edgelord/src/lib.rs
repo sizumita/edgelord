@@ -1,4 +1,5 @@
 mod hook;
+pub mod http;
 
 #[cfg(feature = "discord")]
 pub use edgelord_discord as discord;

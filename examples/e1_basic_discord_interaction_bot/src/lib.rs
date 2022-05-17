@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::sync::Arc;
 use edgelord::discord::{InteractionHandler, command, ChatInputCommandContext, InteractionResponse};
 use worker::*;
 use edgelord::discord::i18n::Locales;
@@ -42,5 +41,5 @@ fn names() -> HashMap<Locales, String> {
 pub async fn help_command(
     ctx: ChatInputCommandContext,
     ) -> InteractionResponse {
-    ctx.message("abc")
+    ctx.message("this is what you want");
 }
