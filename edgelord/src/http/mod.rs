@@ -4,14 +4,36 @@ pub use worker::wasm_bindgen::JsValue as Body;
 
 pub type HttpResult = Result<worker::Response, Box<dyn std::error::Error>>;
 
+/**
+A convenient function for fetch request for GET.
+**/
 pub async fn get(url: &str) -> HttpResult {
     RequestBuilder::new(url).send().await
 }
 
+/**
+A convenient function for fetch request for POST.
+ **/
 pub async fn post(url: &str, body: Option<Body>) -> HttpResult {
     RequestBuilder::new(url).body(body).send().await
 }
 
+/**
+Http request builder for fetch function.
+
+# Example
+
+```
+use edgelord::http::{RequestBuilder, Method};
+use worker::console_log;
+
+let mut res = RequestBuilder::new("https://example.com")
+    .method(Method::Delete)
+    .send().await?;
+
+console_log!("{}", res.text().await?)
+```
+**/
 pub struct RequestBuilder {
     _url: Url,
     _headers: worker::Headers,

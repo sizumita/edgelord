@@ -41,5 +41,5 @@ fn names() -> HashMap<Locales, String> {
 pub async fn help_command(
     ctx: ChatInputCommandContext,
     ) -> InteractionResponse {
-    ctx.message("this is what you want");
+    ctx.message("this is what you want")
 }

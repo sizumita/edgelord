@@ -8,6 +8,9 @@ use worker::{Context, Env};
 use crate::i18n::Locales;
 
 
+/**
+Context for ChatInput Command.
+**/
 pub struct ChatInputCommandContext {
     pub interaction: Box<ApplicationCommand>,
     pub locale: Locales,
@@ -18,7 +21,7 @@ pub struct ChatInputCommandContext {
 impl ChatInputCommandContext {
     pub fn new(interaction: Box<ApplicationCommand>, env: Env, ctx: worker::Context) -> Self {
         Self {
-            interaction,
+            interaction: interaction.clone(),
             locale: serde_json::from_str::<Locales>(&*interaction.locale).unwrap_or(Locales::EnUS),
             env,
             ctx: Arc::new(ctx),
