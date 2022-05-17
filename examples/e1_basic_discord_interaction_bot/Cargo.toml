@@ -10,6 +10,7 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
+cfg-if = "0.1.10"
 worker = "0.0.9"
 edgelord_discord = { path = "../../edgelord_discord", version = "*" }
 

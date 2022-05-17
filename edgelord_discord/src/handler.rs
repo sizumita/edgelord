@@ -57,17 +57,14 @@ impl InteractionHandler {
     Verify interaction and return verify result.
     **/
     pub async fn verify(&self, mut req: &worker::Request) -> Result<(), Box<dyn std::error::Error>> {
-        console_log!("{:?}", self.public_key);
         let signature = Signature::from_bytes(
             &*hex::decode(
                 req.headers().get("X-Signature-Ed25519")?.unwrap()
             )?
         )?;
-        let timestamp = req.headers().get("X-Signature-Timestamp")?.unwrap();
-        let body = req.clone()?.text().await?;
+        let mut message = req.headers().get("X-Signature-Timestamp")?.unwrap().into_bytes();
+        message.append(&mut req.clone()?.bytes().await?);
 
-        let message = format!("{}{}", timestamp, body);
-
-        self.public_key.verify(message.as_bytes(), &signature).map_err(|e| e.into())
+        self.public_key.verify(message.as_slice(), &signature).map_err(|e| e.into())
     }
 }
