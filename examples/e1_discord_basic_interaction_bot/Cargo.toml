@@ -8,6 +8,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 worker = "0.0.9"
+serde = {version = "1.0.137", features = ["derive"]}
+serde_derive = "1.0.137"
 edgelord = { path = "../../edgelord", features = ["discord"]}
 
 [profile.release]

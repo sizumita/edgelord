@@ -15,7 +15,7 @@ pub struct ChatInputCommandContext {
     pub interaction: Box<ApplicationCommand>,
     pub locale: Locales,
     pub env: Env,
-    ctx: Arc<worker::Context>,
+    // ctx: Arc<worker::Context>,
 }
 
 impl ChatInputCommandContext {
@@ -24,7 +24,7 @@ impl ChatInputCommandContext {
             interaction: interaction.clone(),
             locale: serde_json::from_str::<Locales>(&*interaction.locale).unwrap_or(Locales::EnUS),
             env,
-            ctx: Arc::new(ctx),
+            // ctx: Arc::new(ctx),
         }
     }
 

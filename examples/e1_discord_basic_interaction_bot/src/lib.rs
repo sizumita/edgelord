@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use edgelord::discord::{InteractionHandler, command, ChatInputCommandContext, InteractionResponse};
+use edgelord::discord::{InteractionHandler, command, ChatInputCommandContext, InteractionResponse, Choiceable, ChoiceTrait};
 use worker::*;
 use edgelord::discord::i18n::Locales;
 
@@ -9,6 +9,7 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
     edgelord::set_panic_hook();
 
     let router = Router::with_data(worker_context);
+    let v = edgelord::json::Value::from(12);
 
     router
         .post_async(
@@ -42,4 +43,22 @@ pub async fn help_command(
     ctx: ChatInputCommandContext,
     ) -> InteractionResponse {
     ctx.message("this is what you want")
+}
+
+#[command(
+    name = "animal",
+    description = "show animal image",
+)]
+pub async fn animal_image(
+    ctx: ChatInputCommandContext,
+    #[description = "the animal name you want to see"]
+    name: String,
+) -> InteractionResponse {
+    ctx.message("abc")
+}
+
+#[derive(Debug, Choiceable, PartialEq)]
+enum Animals {
+    Dog,
+    Cat,
 }

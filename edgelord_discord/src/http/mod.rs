@@ -1,4 +1,4 @@
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct HttpClient {
     token: String,
     application_id: String,

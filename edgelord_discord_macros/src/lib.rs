@@ -19,19 +19,56 @@
 //! # Examples
 //!
 //! ```rust
-//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse};
+//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command};
 //!
 //! #[command(name = "help", description = "show help message")]
-//! async fn help_message(ctx: ChatInputCommandContext) -> InteractionResponse {
+//! async fn help_message(
+//!     ctx: ChatInputCommandContext,
+//!     #[description = "command group"]
+//!     group: Option<String>,
+//!
+//! ) -> InteractionResponse {
 //!     ctx.message("this is help message!")
 //! }
 //! ```
+//!
+//! # Command Option Choices
+//!
+//! You can use [`Choiceable`] derive for enum and use command option type.
+//!
+//! # Example
+//!
+//! ```
+//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command, Choiceable};
+//!
+//! #[derive(Choiceable)]
+//! enum StringChoices {
+//!     Dog,
+//!     #[choice(rename = "🐱")]
+//!     Cat,
+//!     #[choice(i18n_names = "some_i18n_func")]
+//!     Bull,
+//! }
+//!
+//! #[derive(Choiceable)]
+//! #[repr(u8)]
+//! #[choice(value_type = "integer")] // "float" to f64
+//! enum IntChoices {
+//!     Egg = 12,
+//! }
+//!
+//! ```
+//!
+//!
 mod command;
 mod validate;
+mod choice;
+mod utils;
 
 use proc_macro::TokenStream;
 use darling::FromMeta;
 use proc_macro2::Span;
+use syn::{DeriveInput, parse_macro_input};
 use crate::command::{CommandMeta, parse_command};
 
 
@@ -49,4 +86,12 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
         Ok(stream) => stream,
         Err(e) => e.write_errors().into(),
     }
+}
+
+
+#[proc_macro_derive(Choiceable, attributes(choice, value_type))]
+pub fn derive_choice(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+
+    choice::expand_derive_choice(input).unwrap()
 }

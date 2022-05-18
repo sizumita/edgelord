@@ -1,5 +1,6 @@
 mod context;
 pub mod i18n;
+mod choice;
 
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -8,6 +9,7 @@ use futures::future::{BoxFuture, LocalBoxFuture};
 use twilight_model::application::interaction::ApplicationCommand;
 
 pub use context::*;
+pub use choice::*;
 use crate::InteractionResponse;
 
 type I18nMap = Option<HashMap<i18n::Locales, String>>;

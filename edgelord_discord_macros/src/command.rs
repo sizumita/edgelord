@@ -6,6 +6,7 @@ use syn::FnArg;
 use syn::punctuated::Punctuated;
 use syn::token::Comma;
 use syn::spanned::Spanned as _;
+use crate::utils::parse_i18n;
 use crate::validate::validate_option;
 
 #[derive(Default, Debug, darling::FromMeta)]
@@ -68,12 +69,6 @@ pub(crate) fn parse_command(
     }))
 }
 
-fn parse_i18n(path: Option<syn::Path>) -> proc_macro2::TokenStream {
-    match path {
-        Some(x) => quote! {Some(#x())},
-        None => quote! {None}
-    }
-}
 
 pub(crate) fn parse_options(options: &mut Punctuated<FnArg, Comma>) -> Result<Vec<CommandOption>, darling::Error> {
     let mut parsed_options = Vec::new();
