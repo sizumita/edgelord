@@ -8,21 +8,18 @@
 
 extern crate core;
 
-mod command;
-pub mod http;
-mod handler;
 mod builder;
+mod command;
 mod error;
+mod handler;
 
-use std::collections::HashMap;
-
+pub use async_trait::async_trait;
 pub use edgelord_discord_macros::*;
 pub use twilight_model as model;
-pub use async_trait::async_trait;
 
-pub use command::*;
-pub use handler::*;
 pub use builder::*;
+pub use command::*;
 pub use error::*;
+pub use handler::*;
 
 pub type InteractionResponse = worker::Result<worker::Response>;

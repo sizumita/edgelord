@@ -60,17 +60,16 @@
 //! ```
 //!
 //!
-mod command;
-mod validate;
 mod choice;
+mod command;
 mod utils;
+mod validate;
 
+use crate::command::{parse_command, CommandMeta};
+#[allow(unused_imports)]
+use darling::FromMeta as _;
 use proc_macro::TokenStream;
-use darling::FromMeta;
-use proc_macro2::Span;
-use syn::{DeriveInput, parse_macro_input};
-use crate::command::{CommandMeta, parse_command};
-
+use syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_attribute]
 pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
@@ -87,7 +86,6 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
         Err(e) => e.write_errors().into(),
     }
 }
-
 
 #[proc_macro_derive(Choiceable, attributes(choice, value_type))]
 pub fn derive_choice(input: TokenStream) -> TokenStream {

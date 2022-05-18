@@ -1,5 +1,5 @@
+use crate::{Command, InteractionHandler};
 use ed25519_dalek::PublicKey;
-use crate::{Command, InteractionHandler, http};
 
 /**
 A builder for [`InteractionHandler`].
@@ -8,7 +8,6 @@ pub struct CommandHandlerBuilder<'a> {
     commands: Vec<Command<'a>>,
     public_key: Option<String>,
 }
-
 
 impl<'a> CommandHandlerBuilder<'a> {
     pub fn new() -> Self {
@@ -40,17 +39,16 @@ impl<'a> CommandHandlerBuilder<'a> {
     /**
     Build and return [`InteractionHandler`].
     **/
-    pub fn build(&mut self, token: &str, application_id: &str) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
-        Ok(
-            InteractionHandler {
-                commands: self.commands.clone(),
-                http: http::HttpClient::new(token, application_id),
-                public_key: PublicKey::from_bytes(
-                    &*hex::decode(
-                        self.public_key.clone().unwrap().as_bytes()
-                    )?
-                )?,
-            }
-        )
+    pub fn build(
+        &mut self,
+        _token: &str,
+        _application_id: &str,
+    ) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
+        Ok(InteractionHandler {
+            commands: self.commands.clone(),
+            public_key: PublicKey::from_bytes(&*hex::decode(
+                self.public_key.clone().unwrap().as_bytes(),
+            )?)?,
+        })
     }
 }

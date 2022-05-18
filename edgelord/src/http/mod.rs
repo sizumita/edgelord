@@ -1,6 +1,6 @@
-pub use worker::{Url, Method};
 use worker::wasm_bindgen::JsValue;
 pub use worker::wasm_bindgen::JsValue as Body;
+pub use worker::{Method, Url};
 
 pub type HttpResult = Result<worker::Response, Box<dyn std::error::Error>>;
 
@@ -38,7 +38,7 @@ pub struct RequestBuilder {
     _url: Url,
     _headers: worker::Headers,
     _method: Method,
-    _body: Option<Body>
+    _body: Option<Body>,
 }
 
 impl RequestBuilder {
@@ -72,9 +72,12 @@ impl RequestBuilder {
             worker::RequestInit::new()
                 .with_headers(self._headers.clone())
                 .with_method(self._method.clone())
-                .with_body(self._body.clone())
+                .with_body(self._body.clone()),
         )?;
-        worker::Fetch::Request(request).send().await.map_err(|err| err.into())
+        worker::Fetch::Request(request)
+            .send()
+            .await
+            .map_err(|err| err.into())
     }
 }
 

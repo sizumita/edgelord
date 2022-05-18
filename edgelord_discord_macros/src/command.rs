@@ -1,13 +1,12 @@
-use proc_macro::TokenStream;
-use std::borrow::BorrowMut;
-use darling::FromMeta;
-use quote::quote;
-use syn::FnArg;
-use syn::punctuated::Punctuated;
-use syn::token::Comma;
-use syn::spanned::Spanned as _;
 use crate::utils::parse_i18n;
 use crate::validate::validate_option;
+#[allow(unused_imports)]
+use darling::FromMeta as _;
+use proc_macro::TokenStream;
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned as _;
+use syn::token::Comma;
+use syn::FnArg;
 
 #[derive(Default, Debug, darling::FromMeta)]
 #[darling(default)]
@@ -25,14 +24,13 @@ pub(crate) struct OptionMeta {
     pub description: String,
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
-    pub autocomplete: Option<syn::Path>
+    pub autocomplete: Option<syn::Path>,
 }
 
 pub(crate) struct CommandOption {
     pub name: syn::Ident,
     pub t: syn::Type,
     pub meta: OptionMeta,
-    pub span: proc_macro2::Span,
 }
 
 pub(crate) fn parse_command(
@@ -69,8 +67,9 @@ pub(crate) fn parse_command(
     }))
 }
 
-
-pub(crate) fn parse_options(options: &mut Punctuated<FnArg, Comma>) -> Result<Vec<CommandOption>, darling::Error> {
+pub(crate) fn parse_options(
+    options: &mut Punctuated<FnArg, Comma>,
+) -> Result<Vec<CommandOption>, darling::Error> {
     let mut parsed_options = Vec::new();
 
     for option in options.iter_mut().skip(1) {
@@ -83,9 +82,7 @@ pub(crate) fn parse_options(options: &mut Punctuated<FnArg, Comma>) -> Result<Ve
 
         let name = match &*pattern.pat {
             syn::Pat::Ident(pat_ident) => &pat_ident.ident,
-            x => {
-                return Err(syn::Error::new(x.span(), "name must be identifier").into())
-            }
+            x => return Err(syn::Error::new(x.span(), "name must be identifier").into()),
         };
 
         let attrs = pattern
@@ -102,7 +99,6 @@ pub(crate) fn parse_options(options: &mut Punctuated<FnArg, Comma>) -> Result<Ve
             name: name.clone(),
             t: (*pattern.ty).clone(),
             meta,
-            span: option.span(),
         })
     }
     Ok(parsed_options)

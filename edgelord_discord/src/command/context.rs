@@ -1,12 +1,10 @@
-use std::sync::Arc;
-use twilight_model::application::interaction::{ApplicationCommand};
-use twilight_model::application::interaction::application_command::CommandOptionValue;
-use twilight_model::channel::message::MessageFlags;
-use crate::{Command, InteractionResponse};
-use twilight_model::http::interaction::{InteractionResponseType, InteractionResponseData};
-use worker::{Context, Env};
 use crate::i18n::Locales;
-
+use crate::InteractionResponse;
+use twilight_model::application::interaction::application_command::CommandOptionValue;
+use twilight_model::application::interaction::ApplicationCommand;
+use twilight_model::channel::message::MessageFlags;
+use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
+use worker::Env;
 
 /**
 Context for ChatInput Command.
@@ -15,7 +13,7 @@ pub struct ChatInputCommandContext {
     pub interaction: Box<ApplicationCommand>,
     pub locale: Locales,
     pub env: Env,
-    // ctx: Arc<worker::Context>,
+    pub ctx: worker::Context,
 }
 
 impl ChatInputCommandContext {
@@ -24,14 +22,25 @@ impl ChatInputCommandContext {
             interaction: interaction.clone(),
             locale: serde_json::from_str::<Locales>(&*interaction.locale).unwrap_or(Locales::EnUS),
             env,
-            // ctx: Arc::new(ctx),
+            ctx,
         }
     }
 
-    pub fn get_option<T: std::convert::From<String>>(interaction: Box<ApplicationCommand>, name: &str) -> T {
-        match interaction.data.options.iter().find(|x| x.name == name.to_string()).unwrap().clone().value {
+    pub fn get_option<T: std::convert::From<String>>(
+        interaction: Box<ApplicationCommand>,
+        name: &str,
+    ) -> T {
+        match interaction
+            .data
+            .options
+            .iter()
+            .find(|x| x.name == name.to_string())
+            .unwrap()
+            .clone()
+            .value
+        {
             CommandOptionValue::String(value) => value.into(),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -48,8 +57,8 @@ impl ChatInputCommandContext {
                 embeds: None,
                 flags: Some(MessageFlags::EPHEMERAL),
                 title: None,
-                tts: None
-            })
+                tts: None,
+            }),
         })
     }
 }

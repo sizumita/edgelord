@@ -1,19 +1,24 @@
+mod choice;
 mod context;
 pub mod i18n;
-mod choice;
 
+use futures::future::LocalBoxFuture;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::sync::Arc;
-use futures::future::{BoxFuture, LocalBoxFuture};
 use twilight_model::application::interaction::ApplicationCommand;
 
-pub use context::*;
-pub use choice::*;
 use crate::InteractionResponse;
+pub use choice::*;
+pub use context::*;
 
 type I18nMap = Option<HashMap<i18n::Locales, String>>;
-type AsyncCommandFn<'a> = Rc<dyn 'a + Fn(ChatInputCommandContext, Box<ApplicationCommand>) -> LocalBoxFuture<'a, worker::Result<worker::Response>>>;
+type AsyncCommandFn<'a> = Rc<
+    dyn 'a
+        + Fn(
+            ChatInputCommandContext,
+            Box<ApplicationCommand>,
+        ) -> LocalBoxFuture<'a, worker::Result<worker::Response>>,
+>;
 
 /**
 Discord Chat Input Command Structure.
@@ -39,7 +44,11 @@ pub struct CommandOption {
 }
 
 impl<'a> Command<'a> {
-    pub async fn invoke(&self, ctx: ChatInputCommandContext, interaction: Box<ApplicationCommand>) -> InteractionResponse {
+    pub async fn invoke(
+        &self,
+        ctx: ChatInputCommandContext,
+        interaction: Box<ApplicationCommand>,
+    ) -> InteractionResponse {
         (self.action)(ctx, interaction).await
     }
 }

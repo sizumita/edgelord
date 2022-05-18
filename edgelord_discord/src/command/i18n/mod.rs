@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /**
 Discord i18n Locales.
@@ -47,24 +47,17 @@ pub enum Locales {
     Ko,
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::Locales;
 
     #[test]
     fn test_locale_1() {
-        assert_eq!(
-            serde_json::to_string(&Locales::EnGB).unwrap(),
-            "\"en-GB\""
-        )
+        assert_eq!(serde_json::to_string(&Locales::EnGB).unwrap(), "\"en-GB\"")
     }
 
     #[test]
     fn test_locale_2() {
-        assert_eq!(
-            serde_json::to_string(&Locales::Ja).unwrap(),
-            "\"ja\""
-        )
+        assert_eq!(serde_json::to_string(&Locales::Ja).unwrap(), "\"ja\"")
     }
 }
