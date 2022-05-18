@@ -5,6 +5,7 @@ use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::channel::message::MessageFlags;
 use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
 use worker::Env;
+use crate::option::FromCommandOptionValue;
 
 /**
 Context for ChatInput Command.
@@ -29,19 +30,17 @@ impl ChatInputCommandContext {
     pub fn get_option<T: std::convert::From<String>>(
         interaction: Box<ApplicationCommand>,
         name: &str,
-    ) -> T {
-        match interaction
-            .data
-            .options
-            .iter()
-            .find(|x| x.name == name.to_string())
-            .unwrap()
-            .clone()
-            .value
-        {
-            CommandOptionValue::String(value) => value.into(),
-            _ => unreachable!(),
-        }
+    ) -> T where T: FromCommandOptionValue {
+        T::from_option(
+            interaction
+                .data
+                .options
+                .iter()
+                .find(|x| x.name == name.to_string())
+                .unwrap()
+                .clone()
+                .value
+        ).unwrap()
     }
 
     pub fn message(&self, message: &str) -> InteractionResponse {

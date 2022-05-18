@@ -27,11 +27,14 @@ Http request builder for fetch function.
 use edgelord::http::{RequestBuilder, Method};
 use worker::console_log;
 
-let mut res = RequestBuilder::new("https://example.com")
-    .method(Method::Delete)
-    .send().await?;
 
-console_log!("{}", res.text().await?)
+async fn fetch() {
+    let mut res = RequestBuilder::new("https://example.com")
+    .method(Method::Delete)
+    .send().await.unwrap();
+
+    console_log!("{}", res.text().await.unwrap())
+}
 ```
 **/
 pub struct RequestBuilder {

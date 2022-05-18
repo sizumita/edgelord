@@ -12,10 +12,10 @@ mod builder;
 mod command;
 mod error;
 mod handler;
+pub mod model;
 
 pub use async_trait::async_trait;
 pub use edgelord_discord_macros::*;
-pub use twilight_model as model;
 
 pub use builder::*;
 pub use command::*;

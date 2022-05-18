@@ -1,0 +1,106 @@
+use twilight_model::application::interaction::application_command::CommandOptionValue;
+use twilight_model::id::Id;
+use twilight_model::id::marker::{AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker};
+use crate::Error;
+
+/**
+Trait for command option. If you implemented it, you can use it for command option.
+**/
+pub trait FromCommandOptionValue {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized;
+}
+
+impl FromCommandOptionValue for Id<ChannelMarker> {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Channel(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for Id<RoleMarker> {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Role(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for Id<UserMarker> {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::User(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for Id<GenericMarker> {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Mentionable(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for Id<AttachmentMarker> {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Attachment(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for String {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::String(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for i64 {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Integer(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for bool {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Boolean(value) => Ok(value),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+impl FromCommandOptionValue for f64 {
+    fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized {
+        match value {
+            CommandOptionValue::Number(value) => Ok(value.0),
+            _ => Err(Error::WrongOptionType),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use twilight_model::application::interaction::application_command::CommandOptionValue;
+    use crate::option::FromCommandOptionValue;
+
+    #[test]
+    fn test_string() {
+        assert_eq!(
+            &String::from_option(CommandOptionValue::String("avc".to_string())).unwrap(),
+            "avc"
+        )
+    }
+}

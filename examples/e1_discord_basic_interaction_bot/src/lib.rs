@@ -16,6 +16,7 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
             let RouteContext { env, data, .. } = ctx;
             let handler = InteractionHandler::builder()
                 .command(help_command)
+                .command(animal_image)
                 .public_key(&*env.secret("APPLICATION_PUBLIC_KEY")?.to_string())
                 .build(
                     &*env.secret("DISCORD_BOT_TOKEN")?.to_string(),

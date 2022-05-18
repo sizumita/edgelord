@@ -1,6 +1,7 @@
 mod choice;
 mod context;
 pub mod i18n;
+pub mod option;
 
 use futures::future::LocalBoxFuture;
 use std::collections::HashMap;

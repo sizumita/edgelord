@@ -18,7 +18,7 @@
 //!
 //! # Examples
 //!
-//! ```rust
+//! ```ignore
 //! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command};
 //!
 //! #[command(name = "help", description = "show help message")]
@@ -38,7 +38,7 @@
 //!
 //! # Example
 //!
-//! ```
+//! ```ignore
 //! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command, Choiceable};
 //!
 //! #[derive(Choiceable)]

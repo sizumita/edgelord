@@ -133,12 +133,23 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
         .collect::<Vec<_>>();
     let t = ty.to_ident();
     let inject = {
-        if ty == ChoiceType::String {
-            quote::quote! {
+        match ty {
+            ChoiceType::String => quote::quote! {
+                let value = {
+                    if let CommandOptionValue::String(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                };
                 let value = &*value;
-            }
-        } else {
-            quote::quote! {}
+            },
+            ChoiceType::Integer => quote::quote! {
+                let value = {
+                    if let CommandOptionValue::Integer(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                };
+            },
+            ChoiceType::Float => quote::quote! {
+                let value = {
+                    if let CommandOptionValue::Number(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                };
+            },
         }
     };
 
@@ -149,13 +160,16 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
                     #( #parsed, )*
                 ]
             }
+        }
 
-            fn from_value(value: ::edgelord::discord::ChoiceValue) -> ::std::result::Result<Self, ::edgelord::discord::Error> where Self: Sized {
-                let value = ::edgelord::discord::from_value::<#t>(value).unwrap();
+        use ::edgelord::discord::model::application::interaction::application_command::CommandOptionValue;
+
+        impl ::edgelord::discord::option::FromCommandOptionValue for #enum_name {
+            fn from_option(value: CommandOptionValue) -> ::std::result::Result<Self, ::edgelord::discord::Error> where Self: Sized {
                 #inject
                 match value {
                     #( #matchs, )*
-                    _ => Err(::edgelord::discord::Error::JsonValueError),
+                    _ => Err(::edgelord::discord::Error::WrongOptionType),
                 }
             }
         }
