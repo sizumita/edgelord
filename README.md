@@ -9,7 +9,7 @@ You can use Edgelord to scaffold a basic bot for social networking service.
 
 Edgelord supports previous bot:
 
-- 🚧 discord
+- 🚧 discord -> edgecord
 - 🚧 slack
 
 Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a foundation to build a bot on.
@@ -20,9 +20,9 @@ Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a found
 - 🚧 slack bot support
 - 🚧 Documentation
 
-## 🚧 Discord Bot
+## 🚧 Edgecord - Discord http interaction bot handler
 
-`edgelord_discord` is a fast, light weight, powerful discord http interaction bot framework.
+`edgecord` is a fast, light weight, powerful discord http interaction bot framework.
 It provides type safely commands, automatically publish system.
 
 See /examples/e1_basic_discord_interaction_bot for example.
