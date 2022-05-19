@@ -3,6 +3,7 @@ use crate::validate::validate_option;
 #[allow(unused_imports)]
 use darling::FromMeta as _;
 use proc_macro::TokenStream;
+use darling::util::Flag;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned as _;
 use syn::token::Comma;
@@ -27,6 +28,7 @@ pub(crate) struct OptionMeta {
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
     pub autocomplete: Option<syn::Path>,
+    pub required: Flag,
 }
 
 #[derive(Default, Debug, darling::FromMeta)]
@@ -148,6 +150,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let name = option.meta.name.clone().unwrap_or(option.name.to_string());
     let description = option.meta.description.clone();
     let t = &option.t;
+    let required = &option.meta.required.is_present();
 
     quote::quote! {
         ::edgecord::CommandOption {
@@ -162,7 +165,8 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
                 } else {
                     vec![]
                 }
-            }
+            },
+            required: #required,
         }
     }
 }

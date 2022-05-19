@@ -46,7 +46,7 @@ pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
 #[command(name = "animal", description = "show animal image")]
 pub async fn animal_image(
     ctx: ChatInputCommandContext,
-    #[option(description = "the animal name you want to see")]
+    #[option(description = "the animal name you want to see", required,)]
     name: Animals,
 ) -> InteractionResponse {
     ctx.message("dog")

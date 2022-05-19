@@ -67,6 +67,7 @@ pub struct CommandOption {
     pub i18n_descriptions: I18nMap,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub choices: Vec<Choice>,
+    pub required: bool,
 }
 
 impl<'a> Command<'a> {
