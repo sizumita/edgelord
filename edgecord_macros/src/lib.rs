@@ -59,11 +59,23 @@
 //!
 //! ```
 //!
+//! # Command DefaultPermissions
+//!
+//! You can set default permissions for command with `default_permissions(permission, ...)`.
+//!
+//! ```ignore
+//!
+//! #[edgecord::command(name = "remove_role", description = "remove your role", default_permissions(manage_roles))]
+//! async fn remove_role(ctx: edgecord::Context) -> edgecord::InteractionResponse {
+//!     ctx.message("removed your roles!")
+//! }
+//! ```
 //!
 mod choice;
 mod command;
 mod utils;
 mod validate;
+mod permission;
 
 use crate::command::{parse_command, CommandMeta};
 #[allow(unused_imports)]

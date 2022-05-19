@@ -30,6 +30,7 @@ pub struct Command<'a> {
     pub description: String,
     pub i18n_names: I18nMap,
     pub i18n_descriptions: I18nMap,
+    pub default_permissions: u64,
 
     pub options: Vec<CommandOption>,
 

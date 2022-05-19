@@ -36,7 +36,8 @@ fn names() -> HashMap<Locales, String> {
 #[command(
     name = "help",
     description = "help command for newer.",
-    i18n_names = "names"
+    i18n_names = "names",
+    default_permissions(manage_roles, manage_webhooks)
 )]
 pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
     ctx.message("this is what you want")

@@ -7,6 +7,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned as _;
 use syn::token::Comma;
 use syn::FnArg;
+use crate::permission::PermissionFlagBits;
 
 #[derive(Default, Debug, darling::FromMeta)]
 #[darling(default)]
@@ -15,6 +16,7 @@ pub(crate) struct CommandMeta {
     pub description: String,
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
+    pub default_permissions: PermissionFlagBits,
 }
 
 #[derive(Default, Debug, darling::FromMeta)]
@@ -50,6 +52,7 @@ pub(crate) fn parse_command(
     let options = parse_options(&mut func.sig.inputs)?;
     let parsed_options = options.iter().map(parse_option_meta).collect::<Vec<_>>();
     let action = parse_action(options);
+    let default_permissions = args.default_permissions.bits().bits();
 
     Ok(TokenStream::from(quote::quote! {
         #visibility fn #function_name<'a>() -> ::edgecord::Command<'a> {
@@ -60,6 +63,7 @@ pub(crate) fn parse_command(
                 description: #description.to_string(),
                 i18n_names: #i18n_names,
                 i18n_descriptions: #i18n_descriptions,
+                default_permissions: #default_permissions,
                 options: vec! [#( #parsed_options, )*],
                 action: #action,
             }

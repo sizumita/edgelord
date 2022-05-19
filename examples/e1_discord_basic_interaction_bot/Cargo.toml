@@ -1,5 +1,5 @@
 [package]
-name = "ex_basic_discord_interaction_bot"
+name = "e1_basic_discord_interaction_bot"
 version = "0.1.0"
 edition = "2021"
 
