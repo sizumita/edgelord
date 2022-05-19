@@ -99,7 +99,7 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
     }
 }
 
-#[proc_macro_derive(Choiceable, attributes(choice, value_type))]
+#[proc_macro_derive(Choiceable, attributes(choice))]
 pub fn derive_choice(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
 

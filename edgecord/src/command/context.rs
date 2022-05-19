@@ -26,7 +26,7 @@ impl ChatInputCommandContext {
         }
     }
 
-    pub fn get_option<T: std::convert::From<String>>(
+    pub fn get_option<T>(
         interaction: Box<ApplicationCommand>,
         name: &str,
     ) -> T where T: FromCommandOptionValue {
