@@ -27,15 +27,6 @@ pub(crate) enum ChoiceType {
     Float,
 }
 
-impl ChoiceType {
-    pub fn to_ident(&self) -> syn::Ident {
-        match self {
-            ChoiceType::String => syn::Ident::from_string("String").unwrap(),
-            ChoiceType::Integer => syn::Ident::from_string("i64").unwrap(),
-            ChoiceType::Float => syn::Ident::from_string("f64").unwrap(),
-        }
-    }
-}
 
 #[derive(Debug, darling::FromMeta)]
 pub(crate) struct ChoicesMeta {
@@ -131,45 +122,44 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
         .iter()
         .map(|x| parse_choice_matches(&enum_name, &ty, &x))
         .collect::<Vec<_>>();
-    let t = ty.to_ident();
     let inject = {
         match ty {
             ChoiceType::String => quote::quote! {
                 let value = {
-                    if let CommandOptionValue::String(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                    if let CommandOptionValue::String(value) = value {value} else {return Err(::edgecord::Error::WrongOptionType)}
                 };
                 let value = &*value;
             },
             ChoiceType::Integer => quote::quote! {
                 let value = {
-                    if let CommandOptionValue::Integer(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                    if let CommandOptionValue::Integer(value) = value {value} else {return Err(::edgecord::Error::WrongOptionType)}
                 };
             },
             ChoiceType::Float => quote::quote! {
                 let value = {
-                    if let CommandOptionValue::Number(value) = value {value} else {return Err(::edgelord::discord::Error::WrongOptionType)}
+                    if let CommandOptionValue::Number(value) = value {value} else {return Err(::edgecord::Error::WrongOptionType)}
                 };
             },
         }
     };
 
     Ok(TokenStream::from(quote::quote! {
-        impl ::edgelord::discord::ChoiceTrait for #enum_name {
-            fn choices() -> Vec<::edgelord::discord::Choice> {
+        impl ::edgecord::ChoiceTrait for #enum_name {
+            fn choices() -> Vec<::edgecord::Choice> {
                 vec![
                     #( #parsed, )*
                 ]
             }
         }
 
-        use ::edgelord::discord::model::application::interaction::application_command::CommandOptionValue;
+        use ::edgecord::model::application::interaction::application_command::CommandOptionValue;
 
-        impl ::edgelord::discord::option::FromCommandOptionValue for #enum_name {
-            fn from_option(value: CommandOptionValue) -> ::std::result::Result<Self, ::edgelord::discord::Error> where Self: Sized {
+        impl ::edgecord::option::FromCommandOptionValue for #enum_name {
+            fn from_option(value: CommandOptionValue) -> ::std::result::Result<Self, ::edgecord::Error> where Self: Sized {
                 #inject
                 match value {
                     #( #matchs, )*
-                    _ => Err(::edgelord::discord::Error::WrongOptionType),
+                    _ => Err(::edgecord::Error::WrongOptionType),
                 }
             }
         }
@@ -182,7 +172,7 @@ fn parse_choice(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
     let str_name = choice.meta.rename.clone().unwrap_or(name.to_string());
     let i18n_names = parse_i18n(choice.meta.i18n_names.clone());
     quote::quote! {
-        ::edgelord::discord::Choice {
+        ::edgecord::Choice {
             name: #str_name.to_string(),
             i18n_names: #i18n_names,
             value: #renamed,
@@ -206,15 +196,15 @@ fn parse_choice_value(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStr
     let v = choice.value.clone();
     match ty {
         ChoiceType::String => {
-            quote::quote! { ::edgelord::discord::ChoiceValue::from(#v.to_string()) }
+            quote::quote! { ::edgecord::ChoiceValue::from(#v.to_string()) }
         }
         ChoiceType::Float => {
             let v = v.parse::<f32>().unwrap();
-            quote::quote! { ::edgelord::discord::ChoiceValue::from(#v) }
+            quote::quote! { ::edgecord::ChoiceValue::from(#v) }
         }
         ChoiceType::Integer => {
             let v = v.parse::<i32>().unwrap();
-            quote::quote! { ::edgelord::discord::ChoiceValue::from(#v) }
+            quote::quote! { ::edgecord::ChoiceValue::from(#v) }
         }
     }
 }

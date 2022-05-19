@@ -1,9 +1,9 @@
 [package]
-name = "edgelord_discord_macros"
+name = "edgecord_macros"
 version = "0.0.1"
 edition = "2021"
 authors = ["sizumita <contact@sumidora.com>"]
-description = "Internal macros for edgelord_discord"
+description = "Internal macros for edgecord"
 license = "MIT"
 repository = "https://github.com/sizumita/edgelord"
 

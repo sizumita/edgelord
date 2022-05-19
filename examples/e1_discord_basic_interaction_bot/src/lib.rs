@@ -1,5 +1,5 @@
-use edgelord::discord::i18n::Locales;
-use edgelord::discord::{
+use edgecord::i18n::Locales;
+use edgecord::{
     command, ChatInputCommandContext, Choiceable, InteractionHandler, InteractionResponse,
 };
 use std::collections::HashMap;

@@ -52,10 +52,10 @@ pub(crate) fn parse_command(
     let action = parse_action(options);
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name<'a>() -> ::edgelord::discord::Command<'a> {
+        #visibility fn #function_name<'a>() -> ::edgecord::Command<'a> {
             #func
 
-            ::edgelord::discord::Command {
+            ::edgecord::Command {
                 name: #command_name.to_string(),
                 description: #description.to_string(),
                 i18n_names: #i18n_names,
@@ -114,7 +114,7 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
                 };
                 let t = option.t.clone();
                 quote::quote! {
-                    ::edgelord::discord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
+                    ::edgecord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
                 }
             }
         ).collect::<Vec<_>>();
@@ -130,7 +130,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let description = option.meta.description.clone();
 
     quote::quote! {
-        ::edgelord::discord::CommandOption {
+        ::edgecord::CommandOption {
             name: #name.to_string(),
             description: #description.to_string(),
             i18n_names: #i18n_names,

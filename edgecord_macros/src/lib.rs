@@ -19,7 +19,7 @@
 //! # Examples
 //!
 //! ```ignore
-//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command};
+//! use edgecord::{ChatInputCommandContext, InteractionResponse, command};
 //!
 //! #[command(name = "help", description = "show help message")]
 //! async fn help_message(
@@ -39,7 +39,7 @@
 //! # Example
 //!
 //! ```ignore
-//! use edgelord::discord::{ChatInputCommandContext, InteractionResponse, command, Choiceable};
+//! use edgecord::{ChatInputCommandContext, InteractionResponse, command, Choiceable};
 //!
 //! #[derive(Choiceable)]
 //! enum StringChoices {

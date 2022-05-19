@@ -1,6 +1,6 @@
-//! # edgelord_discord
+//! # edgecord
 //!
-//! `edgelord_discord` is a discord http interaction bot framework for cloudflare workers.
+//! `edgecord` is a discord http interaction bot framework for cloudflare workers.
 //!
 //!
 //!
@@ -15,7 +15,7 @@ mod handler;
 pub mod model;
 
 pub use async_trait::async_trait;
-pub use edgelord_discord_macros::*;
+pub use edgecord_macros::*;
 
 pub use builder::*;
 pub use command::*;

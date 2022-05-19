@@ -9,7 +9,9 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 worker = "0.0.9"
 
-edgelord = { path = "../../edgelord", features = ["discord"]}
+edgecord = { path = "../../edgecord"}
+edgelord = { path = "../../edgelord"}
+
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

@@ -1,6 +1,5 @@
 use crate::i18n::Locales;
 use crate::InteractionResponse;
-use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::channel::message::MessageFlags;
 use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
