@@ -12,6 +12,7 @@ mod builder;
 mod command;
 mod error;
 mod handler;
+pub mod http;
 pub mod model;
 
 pub use async_trait::async_trait;
