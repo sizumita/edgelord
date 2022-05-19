@@ -1,3 +1,4 @@
+use twilight_model::application::command::CommandOptionType;
 use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::id::Id;
 use twilight_model::id::marker::{AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker};
@@ -8,6 +9,8 @@ Trait for command option. If you implemented it, you can use it for command opti
 **/
 pub trait FromCommandOptionValue {
     fn from_option(value: CommandOptionValue) -> Result<Self, crate::Error> where Self: Sized;
+    fn get_option_type() -> CommandOptionType;
+    fn has_choices() -> bool {false}
 }
 
 impl FromCommandOptionValue for Id<ChannelMarker> {
@@ -16,6 +19,10 @@ impl FromCommandOptionValue for Id<ChannelMarker> {
             CommandOptionValue::Channel(value) => Ok(value),
             _ => Err(Error::WrongOptionType),
         }
+    }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Channel
     }
 }
 
@@ -26,6 +33,11 @@ impl FromCommandOptionValue for Id<RoleMarker> {
             _ => Err(Error::WrongOptionType),
         }
     }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Role
+    }
+
 }
 
 impl FromCommandOptionValue for Id<UserMarker> {
@@ -35,6 +47,11 @@ impl FromCommandOptionValue for Id<UserMarker> {
             _ => Err(Error::WrongOptionType),
         }
     }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::User
+    }
+
 }
 
 impl FromCommandOptionValue for Id<GenericMarker> {
@@ -43,6 +60,10 @@ impl FromCommandOptionValue for Id<GenericMarker> {
             CommandOptionValue::Mentionable(value) => Ok(value),
             _ => Err(Error::WrongOptionType),
         }
+    }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Mentionable
     }
 }
 
@@ -53,6 +74,11 @@ impl FromCommandOptionValue for Id<AttachmentMarker> {
             _ => Err(Error::WrongOptionType),
         }
     }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Attachment
+    }
+
 }
 
 impl FromCommandOptionValue for String {
@@ -61,6 +87,10 @@ impl FromCommandOptionValue for String {
             CommandOptionValue::String(value) => Ok(value),
             _ => Err(Error::WrongOptionType),
         }
+    }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::String
     }
 }
 
@@ -71,6 +101,10 @@ impl FromCommandOptionValue for i64 {
             _ => Err(Error::WrongOptionType),
         }
     }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Integer
+    }
 }
 
 impl FromCommandOptionValue for bool {
@@ -80,6 +114,10 @@ impl FromCommandOptionValue for bool {
             _ => Err(Error::WrongOptionType),
         }
     }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Boolean
+    }
 }
 
 impl FromCommandOptionValue for f64 {
@@ -88,6 +126,10 @@ impl FromCommandOptionValue for f64 {
             CommandOptionValue::Number(value) => Ok(value.0),
             _ => Err(Error::WrongOptionType),
         }
+    }
+
+    fn get_option_type() -> CommandOptionType {
+        CommandOptionType::Number
     }
 }
 

@@ -16,7 +16,7 @@ pub(crate) struct CommandMeta {
     pub description: String,
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
-    pub default_permissions: PermissionFlagBits,
+    pub default_permissions: Option<PermissionFlagBits>,
 }
 
 #[derive(Default, Debug, darling::FromMeta)]
@@ -52,10 +52,19 @@ pub(crate) fn parse_command(
     let options = parse_options(&mut func.sig.inputs)?;
     let parsed_options = options.iter().map(parse_option_meta).collect::<Vec<_>>();
     let action = parse_action(options);
-    let default_permissions = args.default_permissions.bits().bits();
+    let default_permissions = {
+        match args.default_permissions {
+            None => quote::quote! {None},
+            Some(x) => {
+                let y = x.bits().bits();
+                quote::quote! {Some(#y)}
+            }
+        }
+    };
 
     Ok(TokenStream::from(quote::quote! {
         #visibility fn #function_name<'a>() -> ::edgecord::Command<'a> {
+            use ::edgecord::option::FromCommandOptionValue;
             #func
 
             ::edgecord::Command {
@@ -132,13 +141,22 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let i18n_descriptions = parse_i18n(option.meta.i18n_descriptions.clone());
     let name = option.meta.name.clone().unwrap_or(option.name.to_string());
     let description = option.meta.description.clone();
+    let t = &option.t;
 
     quote::quote! {
         ::edgecord::CommandOption {
+            option_type: #t::get_option_type(),
             name: #name.to_string(),
             description: #description.to_string(),
             i18n_names: #i18n_names,
             i18n_descriptions: #i18n_descriptions,
+            choices: {
+                if #t::has_choices() {
+                    <#t as ::edgecord::ChoiceTrait>::choices()
+                } else {
+                    vec![]
+                }
+            }
         }
     }
 }

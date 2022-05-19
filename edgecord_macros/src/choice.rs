@@ -28,6 +28,17 @@ pub(crate) enum ChoiceType {
 }
 
 
+impl ChoiceType {
+    pub fn to_option_type(&self) -> proc_macro2::TokenStream {
+        match self {
+            ChoiceType::String => quote::quote! {String},
+            ChoiceType::Integer => quote::quote! {Integer},
+            ChoiceType::Float => quote::quote! {Number},
+        }
+    }
+}
+
+
 #[derive(Debug, darling::FromMeta)]
 pub(crate) struct ChoicesMeta {
     value_type: Option<ChoiceType>,
@@ -142,6 +153,7 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
             },
         }
     };
+    let option_type = ty.to_option_type();
 
     Ok(TokenStream::from(quote::quote! {
         impl ::edgecord::ChoiceTrait for #enum_name {
@@ -152,7 +164,8 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
             }
         }
 
-        use ::edgecord::model::application::interaction::application_command::CommandOptionValue;
+        use ::edgecord::model::application::interaction::application_command::{CommandOptionValue};
+        use ::edgecord::model::application::command::CommandOptionType;
 
         impl ::edgecord::option::FromCommandOptionValue for #enum_name {
             fn from_option(value: CommandOptionValue) -> ::std::result::Result<Self, ::edgecord::Error> where Self: Sized {
@@ -162,6 +175,15 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
                     _ => Err(::edgecord::Error::WrongOptionType),
                 }
             }
+
+            fn get_option_type() -> CommandOptionType {
+                CommandOptionType::#option_type
+            }
+
+            fn has_choices() -> bool {
+                true
+            }
+
         }
     }))
 }

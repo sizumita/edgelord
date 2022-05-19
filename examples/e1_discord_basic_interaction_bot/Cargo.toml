@@ -12,7 +12,14 @@ worker = "0.0.9"
 edgecord = { path = "../../edgecord"}
 edgelord = { path = "../../edgelord"}
 
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = {version = "1.18.2", features = ["full"]}
+
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.
 opt-level = "s"
+
+[[bin]]
+name = "upgrade_command"
+path = "src/bin/upgrade_command.rs"

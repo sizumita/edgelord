@@ -9,6 +9,7 @@ Command Choice Parameter.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Choice {
     pub name: String,
+    #[serde(rename = "name_localizations")]
     pub i18n_names: I18nMap,
     pub value: ChoiceValue,
 }
