@@ -1,4 +1,4 @@
-use crate::{Command, CommandSerializable};
+use crate::{Command};
 use cfg_if::cfg_if;
 #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 use reqwest;
@@ -32,11 +32,7 @@ impl<'a> CommandUploader<'a> {
     }
 
     pub fn make_body(&self) -> String {
-        serde_json::to_string(
-            &self.commands.clone().into_iter().map(
-                |command| CommandSerializable::from(command.clone())
-            ).collect::<Vec<_>>()
-        ).unwrap()
+        serde_json::to_string(&self.commands).unwrap()
     }
 
     cfg_if! {

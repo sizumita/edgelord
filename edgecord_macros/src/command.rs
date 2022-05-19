@@ -29,6 +29,11 @@ pub(crate) struct OptionMeta {
     pub autocomplete: Option<syn::Path>,
 }
 
+#[derive(Default, Debug, darling::FromMeta)]
+pub(crate) struct OptionMetaWrapped {
+    pub option: OptionMeta,
+}
+
 pub(crate) struct CommandOption {
     pub name: syn::Ident,
     pub t: syn::Type,
@@ -68,6 +73,7 @@ pub(crate) fn parse_command(
             #func
 
             ::edgecord::Command {
+                command_type: ::edgecord::model::application::command::CommandType::ChatInput,
                 name: #command_name.to_string(),
                 description: #description.to_string(),
                 i18n_names: #i18n_names,
@@ -104,7 +110,7 @@ pub(crate) fn parse_options(
             .map(|attr| attr.parse_meta().map(syn::NestedMeta::Meta))
             .collect::<Result<Vec<_>, _>>()?;
 
-        let meta = <OptionMeta as darling::FromMeta>::from_list(&attrs)?;
+        let meta = <OptionMetaWrapped as darling::FromMeta>::from_list(&attrs)?.option;
 
         validate_option(&meta, pattern.span())?;
 
