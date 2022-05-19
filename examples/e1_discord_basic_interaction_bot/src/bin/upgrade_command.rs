@@ -1,4 +1,4 @@
-use e1_basic_discord_interaction_bot::{help_command, animal_image};
+use e1_basic_discord_interaction_bot::{animal_image, help_command};
 use edgecord::upload::CommandUploader;
 
 #[tokio::main]

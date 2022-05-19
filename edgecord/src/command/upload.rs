@@ -1,8 +1,7 @@
-use crate::{Command};
+use crate::Command;
 use cfg_if::cfg_if;
 #[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
 use reqwest;
-
 
 pub struct CommandUploader<'a> {
     commands: Vec<Command<'a>>,

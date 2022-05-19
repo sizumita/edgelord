@@ -27,7 +27,6 @@ pub(crate) enum ChoiceType {
     Float,
 }
 
-
 impl ChoiceType {
     pub fn to_option_type(&self) -> proc_macro2::TokenStream {
         match self {
@@ -37,7 +36,6 @@ impl ChoiceType {
         }
     }
 }
-
 
 #[derive(Debug, darling::FromMeta)]
 pub(crate) struct ChoicesMeta {

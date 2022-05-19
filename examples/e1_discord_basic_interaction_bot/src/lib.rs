@@ -46,15 +46,17 @@ pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
 #[command(name = "animal", description = "show animal image")]
 pub async fn animal_image(
     ctx: ChatInputCommandContext,
-    #[option(description = "the animal name you want to see", required,)]
-    name: Animals,
+    #[option(description = "the animal name you want to see", required)] name: Animals,
 ) -> InteractionResponse {
-    ctx.message("dog")
+    match name {
+        Animals::Cat => ctx.message("cat image"),
+        Animals::Dog => ctx.message("dog image"),
+    }
 }
 
 #[derive(Debug, Choiceable, PartialEq)]
 #[choice(value_type = "integer")]
-enum Animals {
+pub enum Animals {
     Dog = 12,
     Cat = 36,
 }

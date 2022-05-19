@@ -1,14 +1,14 @@
+use crate::permission::PermissionFlagBits;
 use crate::utils::parse_i18n;
 use crate::validate::validate_option;
+use darling::util::Flag;
 #[allow(unused_imports)]
 use darling::FromMeta as _;
 use proc_macro::TokenStream;
-use darling::util::Flag;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned as _;
 use syn::token::Comma;
 use syn::FnArg;
-use crate::permission::PermissionFlagBits;
 
 #[derive(Default, Debug, darling::FromMeta)]
 #[darling(default)]
@@ -126,19 +126,19 @@ pub(crate) fn parse_options(
 }
 
 fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
-    let args =
-        options.iter().map(
-            |option| {
-                let name = match &option.meta.name {
-                    None => option.name.to_string(),
-                    Some(x) => x.clone(),
-                };
-                let t = option.t.clone();
-                quote::quote! {
-                    ::edgecord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
-                }
+    let args = options
+        .iter()
+        .map(|option| {
+            let name = match &option.meta.name {
+                None => option.name.to_string(),
+                Some(x) => x.clone(),
+            };
+            let t = option.t.clone();
+            quote::quote! {
+                ::edgecord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
             }
-        ).collect::<Vec<_>>();
+        })
+        .collect::<Vec<_>>();
     quote::quote! {
         ::std::rc::Rc::new(move |ctx, interaction| Box::pin(inner(ctx, #( #args, )*)))
     }

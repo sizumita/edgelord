@@ -1,7 +1,6 @@
 use darling::util::Flag;
 use twilight_model::guild::Permissions;
 
-
 macro_rules! flag_bits {
     (struct $name:ident { $($fname:ident : $ftype:ty),* }) => {
         #[derive(Default, Debug, darling::FromMeta)]
@@ -26,7 +25,6 @@ macro_rules! flag_bits {
         }
     }
 }
-
 
 flag_bits! {
     struct PermissionFlagBits {

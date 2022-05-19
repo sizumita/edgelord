@@ -73,9 +73,9 @@
 //!
 mod choice;
 mod command;
+mod permission;
 mod utils;
 mod validate;
-mod permission;
 
 use crate::command::{parse_command, CommandMeta};
 #[allow(unused_imports)]

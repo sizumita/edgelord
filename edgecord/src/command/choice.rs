@@ -6,7 +6,7 @@ pub type ChoiceValue = serde_json::Value;
 /**
 Command Choice Parameter.
 **/
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Choice {
     pub name: String,
     #[serde(rename = "name_localizations")]

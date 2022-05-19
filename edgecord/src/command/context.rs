@@ -1,10 +1,10 @@
 use crate::i18n::Locales;
+use crate::option::FromCommandOptionValue;
 use crate::InteractionResponse;
 use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::channel::message::MessageFlags;
 use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
 use worker::Env;
-use crate::option::FromCommandOptionValue;
 
 /**
 Context for ChatInput Command.
@@ -26,10 +26,10 @@ impl ChatInputCommandContext {
         }
     }
 
-    pub fn get_option<T>(
-        interaction: Box<ApplicationCommand>,
-        name: &str,
-    ) -> T where T: FromCommandOptionValue {
+    pub fn get_option<T>(interaction: Box<ApplicationCommand>, name: &str) -> T
+    where
+        T: FromCommandOptionValue,
+    {
         T::from_option(
             interaction
                 .data
@@ -38,8 +38,9 @@ impl ChatInputCommandContext {
                 .find(|x| x.name == name.to_string())
                 .unwrap()
                 .clone()
-                .value
-        ).unwrap()
+                .value,
+        )
+        .unwrap()
     }
 
     pub fn message(&self, message: &str) -> InteractionResponse {
