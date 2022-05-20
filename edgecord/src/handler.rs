@@ -3,6 +3,7 @@ use ed25519_dalek::{PublicKey, Signature, Verifier};
 use twilight_model::application::interaction::{Interaction, InteractionType};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
 use worker::{console_error, console_log, Response};
+use crate::http::HttpClient;
 
 /**
 A Discord Interaction Handler.
@@ -11,6 +12,7 @@ Parse Interaction and dispatch commands.
 pub struct InteractionHandler<'a> {
     pub commands: Vec<Command<'a>>,
     pub public_key: PublicKey,
+    pub token: String,
 }
 
 impl<'a> InteractionHandler<'a> {
@@ -57,8 +59,12 @@ impl<'a> InteractionHandler<'a> {
                             panic!("command not found");
                         }
                         Some(cmd) => {
-                            let cmd_ctx = ChatInputCommandContext::new(command.clone(), env, ctx);
-                            console_log!("invoke");
+                            let cmd_ctx = ChatInputCommandContext::new(
+                                command.clone(),
+                                env,
+                                ctx,
+                                HttpClient::new(&*self.token)
+                            );
                             return cmd.invoke(cmd_ctx, command).await;
                         }
                     }

@@ -5,9 +5,12 @@ use crate::model::id::marker::{
 };
 use crate::model::id::Id;
 use crate::model::UrlEncodedEmoji;
-use twilight_model::guild::Emoji;
+
 
 pub enum Routes {
+    // https://discord.com/developers/docs/resources/audit-log
+    /// `/guilds/{guild.id}/audit-logs`
+    GuildAuditLogs(Id<GuildMarker>),
     // https://discord.com/developers/docs/resources/channel
     /// `/channels/{channel.id}`
     Channel(Id<ChannelMarker>),
@@ -197,14 +200,8 @@ pub enum Routes {
 
 impl Display for Routes {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, self.to_string())
-    }
-}
-
-
-impl ToString for Routes {
-    fn to_string(&self) -> String {
-        match self {
+        let path = match self {
+            Routes::GuildAuditLogs(guild_id) => format!("/guilds/{guild_id}/audit-logs"),
             Routes::Channel(channel_id) => format!("/channels/{channel_id}"),
             Routes::ChannelMessages(channel_id) => format!("/channels/{channel_id}/messages"),
             Routes::ChannelMessage(channel_id, message_id) => {
@@ -289,6 +286,7 @@ impl ToString for Routes {
             Routes::WebhookWithTokenSlack(webhook_id, webhook_token) => format!("/webhooks/{webhook_id}/{webhook_token}/slack"),
             Routes::WebhookWithTokenGitHub(webhook_id, webhook_token) => format!("/webhooks/{webhook_id}/{webhook_token}/github"),
             Routes::WebhookWithTokenMessage(webhook_id, webhook_token, message_id) => format!("/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"),
-        }
+        };
+        write!(f, "{}", path)
     }
 }

@@ -41,7 +41,7 @@ impl<'a> CommandHandlerBuilder<'a> {
     **/
     pub fn build(
         &mut self,
-        _token: &str,
+        token: Option<&str>,
         _application_id: &str,
     ) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
         Ok(InteractionHandler {
@@ -49,6 +49,7 @@ impl<'a> CommandHandlerBuilder<'a> {
             public_key: PublicKey::from_bytes(&*hex::decode(
                 self.public_key.clone().unwrap().as_bytes(),
             )?)?,
+            token: token.unwrap_or("").to_string(),
         })
     }
 }
