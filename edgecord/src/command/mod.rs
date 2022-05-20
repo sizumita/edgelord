@@ -2,7 +2,6 @@ mod choice;
 mod context;
 pub mod i18n;
 pub mod option;
-pub mod upload;
 
 use futures::future::LocalBoxFuture;
 use serde::Serialize;

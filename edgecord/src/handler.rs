@@ -2,7 +2,7 @@ use crate::{ChatInputCommandContext, Command, CommandHandlerBuilder};
 use ed25519_dalek::{PublicKey, Signature, Verifier};
 use twilight_model::application::interaction::{Interaction, InteractionType};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
-use worker::{console_error, console_log, Response};
+use worker::{console_error, Response};
 use crate::http::HttpClient;
 
 /**

@@ -24,3 +24,4 @@ pub use error::*;
 pub use handler::*;
 
 pub type InteractionResponse = worker::Result<worker::Response>;
+pub type Result<T> = std::result::Result<T, Error>;
