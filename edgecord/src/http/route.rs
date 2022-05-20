@@ -1,7 +1,7 @@
 use std::fmt::{Display, Formatter};
 use crate::model::id::marker::{
     ChannelMarker, EmojiMarker, GuildMarker, IntegrationMarker, MessageMarker, RoleMarker,
-    ScheduledEventMarker, StickerMarker, UserMarker, WebhookMarker,
+    ScheduledEventMarker, StickerMarker, UserMarker, WebhookMarker, ApplicationMarker, CommandMarker, InteractionMarker
 };
 use crate::model::id::Id;
 use crate::model::UrlEncodedEmoji;
@@ -195,6 +195,30 @@ pub enum Routes {
     WebhookWithTokenGitHub(Id<WebhookMarker>, String),
     /// `/webhooks/{webhook.id}/{webhook.token}/messages/{message.id}`
     WebhookWithTokenMessage(Id<WebhookMarker>, String, Id<MessageMarker>),
+
+    // https://discord.com/developers/docs/interactions/application-commands
+    /// `/applications/{application.id}/commands`
+    ApplicationCommands(Id<ApplicationMarker>),
+    /// `/applications/{application.id}/commands/{command.id}`
+    ApplicationCommand(Id<ApplicationMarker>, Id<CommandMarker>),
+    /// `/applications/{application.id}/guilds/{guild.id}/commands`
+    ApplicationGuildCommands(Id<ApplicationMarker>, Id<GuildMarker>),
+    /// `/applications/{application.id}/guilds/{guild.id}/commands/{command.id}`
+    ApplicationGuildCommand(Id<ApplicationMarker>, Id<GuildMarker>, Id<CommandMarker>),
+    /// `/applications/{application.id}/guilds/{guild.id}/commands/permissions`
+    ApplicationGuildCommandsPermissions(Id<ApplicationMarker>, Id<GuildMarker>),
+    /// `/applications/{application.id}/guilds/{guild.id}/commands/{command.id}/permissions`
+    ApplicationGuildCommandPermissions(Id<ApplicationMarker>, Id<GuildMarker>, Id<CommandMarker>),
+
+    // https://discord.com/developers/docs/interactions/receiving-and-responding
+    /// `/interactions/{interaction.id}/{interaction.token}/callback`
+    InteractionCallback(Id<InteractionMarker>, String),
+    /// `/webhooks/{application.id}/{interaction.token}/messages/@original`
+    ApplicationInteractionOriginalMessage(Id<ApplicationMarker>, String),
+    /// `/webhooks/{application.id}/{interaction.token}`
+    ApplicationInteraction(Id<ApplicationMarker>, String),
+    /// `/webhooks/{application.id}/{interaction.token}/messages/{message.id}`
+    ApplicationInteractionMessage(Id<ApplicationMarker>, String, Id<MessageMarker>),
 }
 
 
@@ -286,6 +310,16 @@ impl Display for Routes {
             Routes::WebhookWithTokenSlack(webhook_id, webhook_token) => format!("/webhooks/{webhook_id}/{webhook_token}/slack"),
             Routes::WebhookWithTokenGitHub(webhook_id, webhook_token) => format!("/webhooks/{webhook_id}/{webhook_token}/github"),
             Routes::WebhookWithTokenMessage(webhook_id, webhook_token, message_id) => format!("/webhooks/{webhook_id}/{webhook_token}/messages/{message_id}"),
+            Routes::ApplicationCommands(application_id) => format!("/applications/{application_id}/commands"),
+            Routes::ApplicationCommand(application_id, command_id) => format!("/applications/{application_id}/commands/{command_id}"),
+            Routes::ApplicationGuildCommands(application_id, guild_id) => format!("/applications/{application_id}/guilds/{guild_id}/commands"),
+            Routes::ApplicationGuildCommand(application_id, guild_id, command_id) => format!("/applications/{application_id}/guilds/{guild_id}/commands/{command_id}"),
+            Routes::ApplicationGuildCommandsPermissions(application_id, guild_id) => format!("/applications/{application_id}/guilds/{guild_id}/commands/permissions"),
+            Routes::ApplicationGuildCommandPermissions(application_id, guild_id, command_id) => format!("/applications/{application_id}/guilds/{guild_id}/commands/{command_id}/permissions"),
+            Routes::InteractionCallback(interaction_id, interaction_token) => format!("/interactions/{interaction_id}/{interaction_token}/callback"),
+            Routes::ApplicationInteractionOriginalMessage(application_id, interaction_token) => format!("/webhooks/{application_id}/{interaction_token}/messages/@original"),
+            Routes::ApplicationInteraction(application_id, interaction_token) => format!("/webhooks/{application_id}/{interaction_token}"),
+            Routes::ApplicationInteractionMessage(application_id, interaction_token, message_id) => format!("/webhooks/{application_id}/{interaction_token}/messages/{message_id}"),
         };
         write!(f, "{}", path)
     }

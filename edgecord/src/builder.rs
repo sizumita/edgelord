@@ -7,6 +7,8 @@ A builder for [`InteractionHandler`].
 pub struct CommandHandlerBuilder<'a> {
     commands: Vec<Command<'a>>,
     public_key: Option<String>,
+    token: Option<String>,
+    application_id: Option<String>,
 }
 
 impl<'a> CommandHandlerBuilder<'a> {
@@ -14,6 +16,8 @@ impl<'a> CommandHandlerBuilder<'a> {
         CommandHandlerBuilder {
             commands: vec![],
             public_key: None,
+            token: None,
+            application_id: None,
         }
     }
 
@@ -27,7 +31,7 @@ impl<'a> CommandHandlerBuilder<'a> {
     }
 
     /**
-    Register application public key for handler.
+    Register application public key to handler.
 
     You have to call this function before build.
     **/
@@ -37,19 +41,31 @@ impl<'a> CommandHandlerBuilder<'a> {
     }
 
     /**
+    Register discord bot token to handler.
+    **/
+    pub fn token(&mut self, token: &str) -> &mut Self {
+        self.token = Some(token.to_string());
+        self
+    }
+
+    /**
+    Register application id to handler.
+    **/
+    pub fn application_id(&mut self, application_id: &str) -> &mut Self {
+        self.application_id = Some(application_id.to_string());
+        self
+    }
+
+    /**
     Build and return [`InteractionHandler`].
     **/
-    pub fn build(
-        &mut self,
-        token: Option<&str>,
-        _application_id: &str,
-    ) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
+    pub fn build(&mut self) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
         Ok(InteractionHandler {
             commands: self.commands.clone(),
             public_key: PublicKey::from_bytes(&*hex::decode(
                 self.public_key.clone().unwrap().as_bytes(),
             )?)?,
-            token: token.unwrap_or("").to_string(),
+            token: self.token.clone().unwrap_or("".to_string()),
         })
     }
 }

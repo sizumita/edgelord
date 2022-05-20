@@ -4,9 +4,6 @@ use edgecord::{
 };
 use std::collections::HashMap;
 use worker::*;
-use edgecord::http::Routes;
-use edgecord::model::channel::Message;
-use edgecord::model::id::Id;
 
 #[event(fetch)]
 pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> Result<Response> {
@@ -21,10 +18,9 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
                 .command(help_command)
                 .command(animal_image)
                 .public_key(&*env.secret("APPLICATION_PUBLIC_KEY")?.to_string())
-                .build(
-                    Some(&*env.secret("DISCORD_BOT_TOKEN")?.to_string()),
-                    &*env.secret("APPLICATION_ID")?.to_string(),
-                )
+                .application_id(&*env.secret("APPLICATION_ID")?.to_string())
+                .token(&*env.secret("DISCORD_BOT_TOKEN")?.to_string())
+                .build()
                 .unwrap();
             handler.process(req, env, data).await
         })
