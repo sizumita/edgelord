@@ -1,12 +1,12 @@
-use crate::{Choice, Error};
+use crate::application_command::{Choice, I18nMap};
+use crate::Error;
+use serde::Serialize;
 use twilight_model::application::command::CommandOptionType;
 use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::id::marker::{
     AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker,
 };
 use twilight_model::id::Id;
-use serde::{Serialize};
-use crate::command::I18nMap;
 
 #[derive(Debug, Clone, Serialize)]
 pub struct CommandOption {
@@ -17,8 +17,8 @@ pub struct CommandOption {
     #[serde(skip_serializing_if = "Option::is_none", rename = "name_localizations")]
     pub i18n_names: I18nMap,
     #[serde(
-    skip_serializing_if = "Option::is_none",
-    rename = "description_localizations"
+        skip_serializing_if = "Option::is_none",
+        rename = "description_localizations"
     )]
     pub i18n_descriptions: I18nMap,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -185,7 +185,7 @@ impl FromCommandOptionValue for f64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::option::FromCommandOptionValue;
+    use super::FromCommandOptionValue;
     use twilight_model::application::interaction::application_command::CommandOptionValue;
 
     #[test]

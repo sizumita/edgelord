@@ -1,4 +1,4 @@
-use crate::command::I18nMap;
+use crate::application_command::I18nMap;
 use serde::{Deserialize, Serialize};
 
 pub type ChoiceValue = serde_json::Value;

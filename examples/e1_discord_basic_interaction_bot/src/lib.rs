@@ -1,7 +1,7 @@
-use edgecord::i18n::Locales;
-use edgecord::{
-    command, ChatInputCommandContext, Choiceable, InteractionHandler, InteractionResponse,
-};
+use edgecord::application_command::i18n::Locales;
+use edgecord::application_command::ChatInputCommandContext;
+use edgecord::handler::InteractionHandler;
+use edgecord::{command, Choiceable, InteractionResponse};
 use std::collections::HashMap;
 use worker::*;
 
@@ -10,7 +10,6 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
     edgelord::set_panic_hook();
 
     let router = Router::with_data(worker_context);
-
     router
         .post_async("/", |req, ctx| async move {
             let RouteContext { env, data, .. } = ctx;

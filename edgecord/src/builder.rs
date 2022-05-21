@@ -1,4 +1,5 @@
-use crate::{Command, InteractionHandler};
+use crate::application_command::Command;
+use crate::handler::InteractionHandler;
 use ed25519_dalek::PublicKey;
 
 /**

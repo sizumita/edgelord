@@ -1,6 +1,6 @@
+use crate::application_command::i18n::Locales;
+use crate::application_command::FromCommandOptionValue;
 use crate::http::HttpClient;
-use crate::i18n::Locales;
-use crate::option::FromCommandOptionValue;
 use crate::InteractionResponse;
 use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::channel::message::MessageFlags;

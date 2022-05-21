@@ -153,8 +153,8 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
     let option_type = ty.to_option_type();
 
     Ok(TokenStream::from(quote::quote! {
-        impl ::edgecord::ChoiceTrait for #enum_name {
-            fn choices() -> Vec<::edgecord::Choice> {
+        impl ::edgecord::application_command::ChoiceTrait for #enum_name {
+            fn choices() -> Vec<::edgecord::application_command::Choice> {
                 vec![
                     #( #parsed, )*
                 ]
@@ -164,7 +164,7 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
         use ::edgecord::model::application::interaction::application_command::{CommandOptionValue};
         use ::edgecord::model::application::command::CommandOptionType;
 
-        impl ::edgecord::option::FromCommandOptionValue for #enum_name {
+        impl ::edgecord::application_command::option::FromCommandOptionValue for #enum_name {
             fn from_option(value: CommandOptionValue) -> ::std::result::Result<Self, ::edgecord::Error> where Self: Sized {
                 #inject
                 match value {
@@ -195,7 +195,7 @@ fn parse_choice(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
         .unwrap_or_else(|| name.to_string());
     let i18n_names = parse_i18n(choice.meta.i18n_names.clone());
     quote::quote! {
-        ::edgecord::Choice {
+        ::edgecord::application_command::choice::Choice {
             name: #str_name.to_string(),
             i18n_names: #i18n_names,
             value: #renamed,
@@ -219,15 +219,15 @@ fn parse_choice_value(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStr
     let v = choice.value.clone();
     match ty {
         ChoiceType::String => {
-            quote::quote! { ::edgecord::ChoiceValue::from(#v.to_string()) }
+            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v.to_string()) }
         }
         ChoiceType::Float => {
             let v = v.parse::<f32>().unwrap();
-            quote::quote! { ::edgecord::ChoiceValue::from(#v) }
+            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v) }
         }
         ChoiceType::Integer => {
             let v = v.parse::<i32>().unwrap();
-            quote::quote! { ::edgecord::ChoiceValue::from(#v) }
+            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v) }
         }
     }
 }

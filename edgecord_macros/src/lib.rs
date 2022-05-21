@@ -73,17 +73,17 @@
 //!
 mod choice;
 mod command;
+mod command_group;
 mod permission;
 mod utils;
 mod validate;
-mod command_group;
 
 use crate::command::{parse_command, CommandMeta};
+use crate::command_group::{parse_command_group, CommandGroupMeta};
 #[allow(unused_imports)]
 use darling::FromMeta as _;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
-use crate::command_group::{CommandGroupMeta, parse_command_group};
 
 #[proc_macro_attribute]
 pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {

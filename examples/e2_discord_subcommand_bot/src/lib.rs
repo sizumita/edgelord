@@ -1,6 +1,6 @@
-use edgecord::{
-    command, group, ChatInputCommandContext, Command, InteractionHandler, InteractionResponse,
-};
+use edgecord::application_command::{ChatInputCommandContext, Command};
+use edgecord::handler::InteractionHandler;
+use edgecord::{command, group, InteractionResponse};
 use worker::*;
 
 #[event(fetch)]

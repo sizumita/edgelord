@@ -1,6 +1,6 @@
+use crate::utils::parse_i18n;
 use proc_macro::TokenStream;
 use syn::spanned::Spanned;
-use crate::utils::parse_i18n;
 
 #[derive(Debug, darling::FromMeta)]
 pub(crate) struct CommandGroupMeta {
@@ -15,7 +15,9 @@ pub(crate) fn parse_command_group(
     mut func: syn::ItemFn,
 ) -> Result<TokenStream, darling::Error> {
     if func.sig.asyncness.is_some() {
-        return Err(syn::Error::new(func.sig.span(), "command group function must not be async").into());
+        return Err(
+            syn::Error::new(func.sig.span(), "command group function must not be async").into(),
+        );
     }
 
     let command_group_name = args.name.unwrap_or_else(|| func.sig.ident.to_string());
@@ -27,10 +29,10 @@ pub(crate) fn parse_command_group(
     let visibility = &func.vis;
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name() -> ::edgecord::CommandGroup {
+        #visibility fn #function_name() -> ::edgecord::application_command::CommandGroup {
             #func
 
-            ::edgecord::CommandGroup {
+            ::edgecord::application_command::CommandGroup {
                 name: #command_group_name.to_string(),
                 description: #description.to_string(),
                 i18n_names: #i18n_names,

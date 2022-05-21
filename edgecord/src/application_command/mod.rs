@@ -1,5 +1,5 @@
-mod choice;
-mod context;
+pub mod choice;
+pub mod context;
 pub mod i18n;
 pub mod option;
 
@@ -8,13 +8,13 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
-use twilight_model::application::command::{CommandType};
+use twilight_model::application::command::CommandType;
 use twilight_model::application::interaction::ApplicationCommand;
 
 use crate::InteractionResponse;
 pub use choice::*;
 pub use context::*;
-use crate::option::CommandOption;
+pub use option::*;
 
 type I18nMap = Option<HashMap<i18n::Locales, String>>;
 type AsyncCommandFn = Rc<

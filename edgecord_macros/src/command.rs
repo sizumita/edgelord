@@ -70,11 +70,11 @@ pub(crate) fn parse_command(
     };
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name() -> ::edgecord::Command {
-            use ::edgecord::option::FromCommandOptionValue;
+        #visibility fn #function_name() -> ::edgecord::application_command::Command {
+            use ::edgecord::application_command::option::FromCommandOptionValue;
             #func
 
-            ::edgecord::Command {
+            ::edgecord::application_command::Command {
                 command_type: ::edgecord::model::application::command::CommandType::ChatInput,
                 name: #command_name.to_string(),
                 description: #description.to_string(),
@@ -135,7 +135,7 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
             };
             let t = option.t.clone();
             quote::quote! {
-                ::edgecord::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
+                ::edgecord::application_command::context::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
             }
         })
         .collect::<Vec<_>>();
@@ -157,7 +157,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let required = &option.meta.required.is_present();
 
     quote::quote! {
-        ::edgecord::CommandOption {
+        ::edgecord::application_command::CommandOption {
             option_type: #t::get_option_type(),
             name: #name.to_string(),
             description: #description.to_string(),
@@ -165,7 +165,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
             i18n_descriptions: #i18n_descriptions,
             choices: {
                 if #t::has_choices() {
-                    <#t as ::edgecord::ChoiceTrait>::choices()
+                    <#t as ::edgecord::application_command::ChoiceTrait>::choices()
                 } else {
                     vec![]
                 }

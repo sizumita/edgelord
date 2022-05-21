@@ -10,7 +10,7 @@ use worker::Method;
 async fn main() {
     let client = HttpClient::new(std::env::var("DISCORD_BOT_TOKEN").unwrap().as_str());
     let result = client
-        .request::<Vec<Command>, Vec<edgecord::Command>>(
+        .request::<Vec<Command>, Vec<edgecord::application_command::Command>>(
             Method::Put,
             Routes::ApplicationGuildCommands(
                 Id::from_str(std::env::var("APPLICATION_ID").unwrap().as_str()).unwrap(),
