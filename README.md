@@ -25,7 +25,44 @@ Since Edgelord is a Light Wrapper for cloudflare workers, you can use as a found
 `edgecord` is a fast, light weight, powerful discord http interaction bot framework.
 It provides type safely commands, automatically publish system.
 
-See /examples/e1_basic_discord_interaction_bot for example.
+### Example
+
+```rust
+use edgecord::{
+    command, ChatInputCommandContext, InteractionHandler, InteractionResponse,
+};
+use worker::*;
+
+#[event(fetch)]
+pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> Result<Response> {
+    edgelord::set_panic_hook();
+
+    let router = Router::with_data(worker_context);
+
+    router
+        .post_async("/", |req, ctx| async move {
+            let RouteContext { env, data, .. } = ctx;
+            let handler = InteractionHandler::builder()
+                .command(help_command)
+                .public_key(&*env.secret("APPLICATION_PUBLIC_KEY")?.to_string())
+                .application_id(&*env.secret("APPLICATION_ID")?.to_string())
+                .token(&*env.secret("DISCORD_BOT_TOKEN")?.to_string())
+                .build()
+                .unwrap();
+            handler.process(req, env, data).await
+        })
+        .run(req, env)
+        .await
+}
+
+#[command(
+    name = "help",
+    description = "help command.",
+)]
+pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
+    ctx.message("this is what you want")
+}
+```
 
 # Contribution
 
