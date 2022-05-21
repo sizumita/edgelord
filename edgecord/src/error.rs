@@ -15,7 +15,7 @@ impl std::fmt::Display for Error {
             Error::WrongOptionType => write!(f, "wrong option type was passed"),
             Error::Forbidden => write!(f, "Bot don't have permission for the operation"),
             Error::NotFound => write!(f, "The Endpoint is not found"),
-            Error::HttpError => write!(f, "An Http Exception is raised")
+            Error::HttpError => write!(f, "An Http Exception is raised"),
         }
     }
 }

@@ -1,6 +1,4 @@
-pub trait RateLimitBucket {
-
-}
+pub trait RateLimitBucket {}
 
 pub struct DefaultRateLimitBucket {}
 

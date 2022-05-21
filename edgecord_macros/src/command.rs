@@ -49,7 +49,7 @@ pub(crate) fn parse_command(
     if func.sig.asyncness.is_none() {
         return Err(syn::Error::new(func.sig.span(), "command function must be async").into());
     }
-    let command_name = args.name.unwrap_or(func.sig.ident.to_string());
+    let command_name = args.name.unwrap_or_else(|| func.sig.ident.to_string());
     let description = args.description;
     let i18n_names = parse_i18n(args.i18n_names);
     let i18n_descriptions = parse_i18n(args.i18n_descriptions);
@@ -147,7 +147,11 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
 fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let i18n_names = parse_i18n(option.meta.i18n_names.clone());
     let i18n_descriptions = parse_i18n(option.meta.i18n_descriptions.clone());
-    let name = option.meta.name.clone().unwrap_or(option.name.to_string());
+    let name = option
+        .meta
+        .name
+        .clone()
+        .unwrap_or_else(|| option.name.to_string());
     let description = option.meta.description.clone();
     let t = &option.t;
     let required = &option.meta.required.is_present();

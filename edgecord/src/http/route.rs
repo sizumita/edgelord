@@ -1,11 +1,12 @@
-use std::fmt::{Display, Formatter};
+#![allow(clippy::useless_format)]
 use crate::model::id::marker::{
-    ChannelMarker, EmojiMarker, GuildMarker, IntegrationMarker, MessageMarker, RoleMarker,
-    ScheduledEventMarker, StickerMarker, UserMarker, WebhookMarker, ApplicationMarker, CommandMarker, InteractionMarker
+    ApplicationMarker, ChannelMarker, CommandMarker, EmojiMarker, GuildMarker, IntegrationMarker,
+    InteractionMarker, MessageMarker, RoleMarker, ScheduledEventMarker, StickerMarker, UserMarker,
+    WebhookMarker,
 };
 use crate::model::id::Id;
 use crate::model::UrlEncodedEmoji;
-
+use std::fmt::{Display, Formatter};
 
 pub enum Routes {
     // https://discord.com/developers/docs/resources/audit-log
@@ -220,7 +221,6 @@ pub enum Routes {
     /// `/webhooks/{application.id}/{interaction.token}/messages/{message.id}`
     ApplicationInteractionMessage(Id<ApplicationMarker>, String, Id<MessageMarker>),
 }
-
 
 impl Display for Routes {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

@@ -2,3 +2,4 @@ target/
 Cargo.lock
 build/
 node_modules/
+pkg/

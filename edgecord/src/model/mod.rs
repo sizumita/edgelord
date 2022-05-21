@@ -1,7 +1,6 @@
 use std::fmt::{Display, Formatter};
 pub use twilight_model::*;
 
-
 /// Emoji for encoding to URL Encoded.
 pub struct UrlEncodedEmoji(guild::Emoji);
 

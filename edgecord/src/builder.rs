@@ -4,6 +4,7 @@ use ed25519_dalek::PublicKey;
 /**
 A builder for [`InteractionHandler`].
  **/
+#[derive(Default)]
 pub struct CommandHandlerBuilder<'a> {
     commands: Vec<Command<'a>>,
     public_key: Option<String>,
@@ -13,12 +14,7 @@ pub struct CommandHandlerBuilder<'a> {
 
 impl<'a> CommandHandlerBuilder<'a> {
     pub fn new() -> Self {
-        CommandHandlerBuilder {
-            commands: vec![],
-            public_key: None,
-            token: None,
-            application_id: None,
-        }
+        CommandHandlerBuilder::default()
     }
 
     /**
@@ -65,7 +61,7 @@ impl<'a> CommandHandlerBuilder<'a> {
             public_key: PublicKey::from_bytes(&*hex::decode(
                 self.public_key.clone().unwrap().as_bytes(),
             )?)?,
-            token: self.token.clone().unwrap_or("".to_string()),
+            token: self.token.clone().unwrap_or_default(),
         })
     }
 }

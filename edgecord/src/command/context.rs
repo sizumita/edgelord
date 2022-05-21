@@ -1,3 +1,4 @@
+use crate::http::HttpClient;
 use crate::i18n::Locales;
 use crate::option::FromCommandOptionValue;
 use crate::InteractionResponse;
@@ -5,7 +6,6 @@ use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::channel::message::MessageFlags;
 use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
 use worker::Env;
-use crate::http::HttpClient;
 
 /**
 Context for ChatInput Command.
@@ -19,7 +19,12 @@ pub struct ChatInputCommandContext {
 }
 
 impl ChatInputCommandContext {
-    pub fn new(interaction: Box<ApplicationCommand>, env: Env, ctx: worker::Context, http: HttpClient) -> Self {
+    pub fn new(
+        interaction: Box<ApplicationCommand>,
+        env: Env,
+        ctx: worker::Context,
+        http: HttpClient,
+    ) -> Self {
         Self {
             interaction: interaction.clone(),
             locale: serde_json::from_str::<Locales>(&*interaction.locale).unwrap_or(Locales::EnUS),
@@ -38,7 +43,7 @@ impl ChatInputCommandContext {
                 .data
                 .options
                 .iter()
-                .find(|x| x.name == name.to_string())
+                .find(|x| x.name == *name)
                 .unwrap()
                 .clone()
                 .value,

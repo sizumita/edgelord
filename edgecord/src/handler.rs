@@ -1,9 +1,9 @@
+use crate::http::HttpClient;
 use crate::{ChatInputCommandContext, Command, CommandHandlerBuilder};
 use ed25519_dalek::{PublicKey, Signature, Verifier};
 use twilight_model::application::interaction::{Interaction, InteractionType};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
 use worker::{console_error, Response};
-use crate::http::HttpClient;
 
 /**
 A Discord Interaction Handler.
@@ -51,7 +51,7 @@ impl<'a> InteractionHandler<'a> {
                 kind: InteractionResponseType::Pong,
                 data: None,
             }),
-            Interaction::ApplicationCommand(command) => match command.kind.clone() {
+            Interaction::ApplicationCommand(command) => match command.kind {
                 InteractionType::ApplicationCommand => {
                     match self.get_command(command.data.name.clone()) {
                         None => {
@@ -63,7 +63,7 @@ impl<'a> InteractionHandler<'a> {
                                 command.clone(),
                                 env,
                                 ctx,
-                                HttpClient::new(&*self.token)
+                                HttpClient::new(&*self.token),
                             );
                             return cmd.invoke(cmd_ctx, command).await;
                         }
@@ -97,9 +97,6 @@ impl<'a> InteractionHandler<'a> {
     }
 
     pub fn get_command(&self, name: String) -> Option<Command<'a>> {
-        self.commands
-            .iter()
-            .find(|cmd| cmd.name == name)
-            .and_then(|x| Some(x.clone()))
+        self.commands.iter().find(|cmd| cmd.name == name).cloned()
     }
 }

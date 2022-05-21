@@ -7,6 +7,9 @@ description = "A discord interaction bot framework for cloudflare workers"
 license = "MIT"
 repository = "https://github.com/sizumita/edgelord"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 worker = "0.0.9"
 edgelord = { path = "../edgelord" }

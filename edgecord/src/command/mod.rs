@@ -65,17 +65,17 @@ pub struct Command<'a> {
 
 impl Debug for Command<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} {{\n", self.name)?;
-        write!(f, "    type: {:?},\n", self.command_type)?;
-        write!(f, "    description: {:?},\n", self.description)?;
-        write!(f, "    i18n_names: {:?},\n", self.i18n_names)?;
-        write!(f, "    i18n_descriptions: {:?},\n", self.i18n_descriptions)?;
-        write!(
+        writeln!(f, "{} {{", self.name)?;
+        writeln!(f, "    type: {:?},", self.command_type)?;
+        writeln!(f, "    description: {:?},", self.description)?;
+        writeln!(f, "    i18n_names: {:?},", self.i18n_names)?;
+        writeln!(f, "    i18n_descriptions: {:?},", self.i18n_descriptions)?;
+        writeln!(
             f,
-            "    default_permissions: {:?},\n",
+            "    default_permissions: {:?},",
             self.default_permissions
         )?;
-        write!(f, "    options: {:?},\n", self.options)?;
+        writeln!(f, "    options: {:?},", self.options)?;
         write!(f, "}}")
     }
 }

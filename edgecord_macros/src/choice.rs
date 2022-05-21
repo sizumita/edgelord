@@ -120,7 +120,6 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
     let ty = enum_meta
         .unwrap_or(ChoicesMeta { value_type: None })
         .value_type
-        .clone()
         .unwrap_or(ChoiceType::String);
     let parsed = choices
         .iter()
@@ -129,7 +128,7 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
     let matchs = choices
         .clone()
         .iter()
-        .map(|x| parse_choice_matches(&enum_name, &ty, &x))
+        .map(|x| parse_choice_matches(enum_name, &ty, x))
         .collect::<Vec<_>>();
     let inject = {
         match ty {
@@ -189,7 +188,11 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
 fn parse_choice(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
     let name = &choice.ident;
     let renamed = parse_choice_value(ty, choice);
-    let str_name = choice.meta.rename.clone().unwrap_or(name.to_string());
+    let str_name = choice
+        .meta
+        .rename
+        .clone()
+        .unwrap_or_else(|| name.to_string());
     let i18n_names = parse_i18n(choice.meta.i18n_names.clone());
     quote::quote! {
         ::edgecord::Choice {
