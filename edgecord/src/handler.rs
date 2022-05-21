@@ -9,13 +9,13 @@ use worker::{console_error, Response};
 A Discord Interaction Handler.
 Parse Interaction and dispatch commands.
 **/
-pub struct InteractionHandler<'a> {
-    pub commands: Vec<Command<'a>>,
+pub struct InteractionHandler {
+    pub commands: Vec<Command>,
     pub public_key: PublicKey,
     pub token: String,
 }
 
-impl<'a> InteractionHandler<'a> {
+impl InteractionHandler {
     /**
     Returns [`CommandHandlerBuilder`].
 
@@ -27,7 +27,7 @@ impl<'a> InteractionHandler<'a> {
     ```
 
     **/
-    pub fn builder() -> CommandHandlerBuilder<'a> {
+    pub fn builder() -> CommandHandlerBuilder {
         CommandHandlerBuilder::new()
     }
 
@@ -96,7 +96,7 @@ impl<'a> InteractionHandler<'a> {
             .map_err(|e| e.into())
     }
 
-    pub fn get_command(&self, name: String) -> Option<Command<'a>> {
+    pub fn get_command(&self, name: String) -> Option<Command> {
         self.commands.iter().find(|cmd| cmd.name == name).cloned()
     }
 }

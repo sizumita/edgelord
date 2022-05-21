@@ -70,7 +70,7 @@ pub(crate) fn parse_command(
     };
 
     Ok(TokenStream::from(quote::quote! {
-        #visibility fn #function_name<'a>() -> ::edgecord::Command<'a> {
+        #visibility fn #function_name() -> ::edgecord::Command {
             use ::edgecord::option::FromCommandOptionValue;
             #func
 

@@ -43,7 +43,7 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
         .post_async("/", |req, ctx| async move {
             let RouteContext { env, data, .. } = ctx;
             let handler = InteractionHandler::builder()
-                .command(help_command)
+                .command(help_command())
                 .public_key(&*env.secret("APPLICATION_PUBLIC_KEY")?.to_string())
                 .application_id(&*env.secret("APPLICATION_ID")?.to_string())
                 .token(&*env.secret("DISCORD_BOT_TOKEN")?.to_string())

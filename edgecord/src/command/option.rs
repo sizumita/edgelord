@@ -1,10 +1,30 @@
-use crate::Error;
+use crate::{Choice, Error};
 use twilight_model::application::command::CommandOptionType;
 use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::id::marker::{
     AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker,
 };
 use twilight_model::id::Id;
+use serde::{Serialize};
+use crate::command::I18nMap;
+
+#[derive(Debug, Clone, Serialize)]
+pub struct CommandOption {
+    #[serde(rename = "type")]
+    pub option_type: CommandOptionType,
+    pub name: String,
+    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "name_localizations")]
+    pub i18n_names: I18nMap,
+    #[serde(
+    skip_serializing_if = "Option::is_none",
+    rename = "description_localizations"
+    )]
+    pub i18n_descriptions: I18nMap,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub choices: Vec<Choice>,
+    pub required: bool,
+}
 
 /**
 Trait for command option. If you implemented it, you can use it for command option.

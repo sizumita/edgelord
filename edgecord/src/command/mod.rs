@@ -8,20 +8,21 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
-use twilight_model::application::command::{CommandOptionType, CommandType};
+use twilight_model::application::command::{CommandType};
 use twilight_model::application::interaction::ApplicationCommand;
 
 use crate::InteractionResponse;
 pub use choice::*;
 pub use context::*;
+use crate::option::CommandOption;
 
 type I18nMap = Option<HashMap<i18n::Locales, String>>;
-type AsyncCommandFn<'a> = Rc<
-    dyn 'a
+type AsyncCommandFn = Rc<
+    dyn 'static
         + Fn(
             ChatInputCommandContext,
             Box<ApplicationCommand>,
-        ) -> LocalBoxFuture<'a, worker::Result<worker::Response>>,
+        ) -> LocalBoxFuture<'static, worker::Result<worker::Response>>,
 >;
 
 fn serialize_permissions<S: serde::Serializer>(
@@ -39,7 +40,7 @@ fn serialize_permissions<S: serde::Serializer>(
 Discord Chat Input Command Structure.
  **/
 #[derive(Clone, Serialize)]
-pub struct Command<'a> {
+pub struct Command {
     #[serde(rename = "type")]
     pub command_type: CommandType,
     pub name: String,
@@ -60,10 +61,10 @@ pub struct Command<'a> {
     pub options: Vec<CommandOption>,
 
     #[serde(skip)]
-    pub action: AsyncCommandFn<'a>,
+    pub action: AsyncCommandFn,
 }
 
-impl Debug for Command<'_> {
+impl Debug for Command {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{} {{", self.name)?;
         writeln!(f, "    type: {:?},", self.command_type)?;
@@ -80,7 +81,7 @@ impl Debug for Command<'_> {
     }
 }
 
-impl ToString for Command<'_> {
+impl ToString for Command {
     /**
     Returns JSON serialized string.
     **/
@@ -89,25 +90,7 @@ impl ToString for Command<'_> {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
-pub struct CommandOption {
-    #[serde(rename = "type")]
-    pub option_type: CommandOptionType,
-    pub name: String,
-    pub description: String,
-    #[serde(skip_serializing_if = "Option::is_none", rename = "name_localizations")]
-    pub i18n_names: I18nMap,
-    #[serde(
-        skip_serializing_if = "Option::is_none",
-        rename = "description_localizations"
-    )]
-    pub i18n_descriptions: I18nMap,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub choices: Vec<Choice>,
-    pub required: bool,
-}
-
-impl<'a> Command<'a> {
+impl Command {
     pub async fn invoke(
         &self,
         ctx: ChatInputCommandContext,
@@ -115,4 +98,13 @@ impl<'a> Command<'a> {
     ) -> InteractionResponse {
         (self.action)(ctx, interaction).await
     }
+}
+
+#[derive(Clone)]
+pub struct CommandGroup {
+    pub name: String,
+    pub i18n_names: I18nMap,
+    pub description: String,
+    pub i18n_descriptions: I18nMap,
+    pub commands: Vec<Command>,
 }

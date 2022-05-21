@@ -5,14 +5,14 @@ use ed25519_dalek::PublicKey;
 A builder for [`InteractionHandler`].
  **/
 #[derive(Default)]
-pub struct CommandHandlerBuilder<'a> {
-    commands: Vec<Command<'a>>,
+pub struct CommandHandlerBuilder {
+    commands: Vec<Command>,
     public_key: Option<String>,
     token: Option<String>,
     application_id: Option<String>,
 }
 
-impl<'a> CommandHandlerBuilder<'a> {
+impl CommandHandlerBuilder {
     pub fn new() -> Self {
         CommandHandlerBuilder::default()
     }
@@ -21,8 +21,8 @@ impl<'a> CommandHandlerBuilder<'a> {
     Register command for [`InteractionHandler`].
     You should create [`Command`] with `command` macro.
     **/
-    pub fn command(&mut self, func: fn() -> Command<'a>) -> &mut Self {
-        self.commands.push(func());
+    pub fn command(&mut self, command: Command) -> &mut Self {
+        self.commands.push(command);
         self
     }
 
@@ -55,7 +55,7 @@ impl<'a> CommandHandlerBuilder<'a> {
     /**
     Build and return [`InteractionHandler`].
     **/
-    pub fn build(&mut self) -> Result<InteractionHandler<'a>, Box<dyn std::error::Error>> {
+    pub fn build(&mut self) -> Result<InteractionHandler, Box<dyn std::error::Error>> {
         Ok(InteractionHandler {
             commands: self.commands.clone(),
             public_key: PublicKey::from_bytes(&*hex::decode(

@@ -76,12 +76,14 @@ mod command;
 mod permission;
 mod utils;
 mod validate;
+mod command_group;
 
 use crate::command::{parse_command, CommandMeta};
 #[allow(unused_imports)]
 use darling::FromMeta as _;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
+use crate::command_group::{CommandGroupMeta, parse_command_group};
 
 #[proc_macro_attribute]
 pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
@@ -94,6 +96,22 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
     let function = syn::parse_macro_input!(func as syn::ItemFn);
 
     match parse_command(args, function) {
+        Ok(stream) => stream,
+        Err(e) => e.write_errors().into(),
+    }
+}
+
+#[proc_macro_attribute]
+pub fn group(args: TokenStream, func: TokenStream) -> TokenStream {
+    let args = syn::parse_macro_input!(args as Vec<syn::NestedMeta>);
+    let args = match <CommandGroupMeta as darling::FromMeta>::from_list(&args) {
+        Ok(x) => x,
+        Err(e) => return e.write_errors().into(),
+    };
+
+    let function = syn::parse_macro_input!(func as syn::ItemFn);
+
+    match parse_command_group(args, function) {
         Ok(stream) => stream,
         Err(e) => e.write_errors().into(),
     }
