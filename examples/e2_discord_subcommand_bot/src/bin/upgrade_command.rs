@@ -5,7 +5,6 @@ use edgecord::model::id::Id;
 use std::str::FromStr;
 use worker::Method;
 
-
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() {

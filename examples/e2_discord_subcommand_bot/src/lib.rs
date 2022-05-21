@@ -1,4 +1,6 @@
-use edgecord::{command, ChatInputCommandContext, InteractionHandler, InteractionResponse, group, Command};
+use edgecord::{
+    command, group, ChatInputCommandContext, Command, InteractionHandler, InteractionResponse,
+};
 use worker::*;
 
 #[event(fetch)]
@@ -26,7 +28,6 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
 fn animals() -> Vec<Command> {
     vec![cat_emoji(), dog_emoji()]
 }
-
 
 #[command(name = "cat", description = "show cat emoji")]
 async fn cat_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
