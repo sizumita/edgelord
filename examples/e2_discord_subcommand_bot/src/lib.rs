@@ -1,4 +1,4 @@
-use edgecord::application_command::{ChatInputCommandContext, Command};
+use edgecord::application_command::{ChatInputCommandContext, SubCommand};
 use edgecord::handler::InteractionHandler;
 use edgecord::{command, group, InteractionResponse};
 use worker::*;
@@ -24,9 +24,20 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
         .await
 }
 
+#[group(description = "show anything emoji")]
+pub fn emojis() -> Vec<SubCommand> {
+    vec![
+        SubCommand::Group(animals()),
+        SubCommand::Command(human_emoji()),
+    ]
+}
+
 #[group(description = "show animal emoji")]
-pub fn animals() -> Vec<Command> {
-    vec![cat_emoji(), dog_emoji()]
+fn animals() -> Vec<SubCommand> {
+    vec![
+        SubCommand::Command(cat_emoji()),
+        SubCommand::Command(dog_emoji()),
+    ]
 }
 
 #[command(name = "cat", description = "show cat emoji")]
@@ -37,4 +48,9 @@ async fn cat_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
 #[command(name = "dog", description = "show dog emoji")]
 async fn dog_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
     ctx.message("🐶")
+}
+
+#[command(name = "human", description = "show human emoji")]
+async fn human_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
+    ctx.message("👶")
 }

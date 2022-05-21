@@ -1,10 +1,10 @@
 pub mod choice;
 pub mod context;
+pub mod group;
 pub mod i18n;
 pub mod option;
 
 use futures::future::LocalBoxFuture;
-use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
@@ -15,6 +15,7 @@ use twilight_model::application::interaction::ApplicationCommand;
 use crate::InteractionResponse;
 pub use choice::*;
 pub use context::*;
+pub use group::*;
 pub use option::*;
 
 type I18nMap = Option<HashMap<i18n::Locales, String>>;
@@ -102,50 +103,39 @@ impl Command {
 }
 
 #[derive(Clone)]
-pub struct CommandGroup {
-    pub name: String,
-    pub i18n_names: I18nMap,
-    pub description: String,
-    pub i18n_descriptions: I18nMap,
-    pub default_permissions: Option<u64>,
-
-    pub commands: Vec<Command>,
+pub enum SubCommand {
+    Command(Command),
+    Group(CommandGroup),
 }
 
-impl Serialize for CommandGroup {
+impl Serialize for SubCommand {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let mut state = serializer.serialize_struct("CommandGroup", 6)?;
-        state.serialize_field("name", self.name.as_str())?;
-        state.serialize_field("description", self.description.as_str())?;
-
-        if let Some(map) = self.i18n_names.clone() {
-            state.serialize_field("name_localizations", &map)?;
-        } else {
-            state.skip_field("name_localizations")?;
+        match self {
+            Self::Command(command) => {
+                CommandAsSubCommand::from(command.clone()).serialize(serializer)
+            }
+            Self::Group(group) => {
+                CommandGroupAsSubCommandGroup::from(group.clone()).serialize(serializer)
+            }
         }
+    }
+}
 
-        if let Some(map) = self.i18n_descriptions.clone() {
-            state.serialize_field("description_localizations", &map)?;
-        } else {
-            state.skip_field("description_localizations")?;
+impl SubCommand {
+    pub fn is_group(&self) -> bool {
+        match self {
+            Self::Command(_) => false,
+            Self::Group(_) => true,
         }
+    }
 
-        if let Some(permissions) = self.default_permissions {
-            state.serialize_field("default_member_permissions", &permissions)?;
-        } else {
-            state.skip_field("default_member_permissions")?;
+    pub fn get_name(&self) -> String {
+        match self {
+            Self::Command(cmd) => cmd.name.clone(),
+            Self::Group(group) => group.name.clone(),
         }
-
-        let options = self
-            .commands
-            .iter()
-            .map(|command| command.clone().into())
-            .collect::<Vec<CommandAsSubCommand>>();
-        state.serialize_field("options", &options)?;
-
-        state.end()
     }
 }

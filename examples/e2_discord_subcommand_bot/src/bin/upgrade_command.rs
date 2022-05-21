@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use e2_discord_subcommand_bot::animals;
+use e2_discord_subcommand_bot::emojis;
 use edgecord::application_command::CommandGroup;
 use edgecord::http::{HttpClient, Routes};
 use edgecord::model::application::command::Command;
@@ -18,7 +18,7 @@ async fn main() {
                 Id::from_str(std::env::var("APPLICATION_ID").unwrap().as_str()).unwrap(),
                 Id::new(731029130488971275),
             ),
-            Some(vec![animals()]),
+            Some(vec![emojis()]),
         )
         .await;
     println!("{:?}", result);

@@ -1,4 +1,4 @@
-use crate::application_command::{ChatInputCommandContext, Command, CommandGroup};
+use crate::application_command::{ChatInputCommandContext, Command, CommandGroup, SubCommand};
 use crate::builder::CommandHandlerBuilder;
 use crate::http::HttpClient;
 use ed25519_dalek::{PublicKey, Signature, Verifier};
@@ -127,10 +127,14 @@ impl InteractionHandler {
                     if let Some(sub_command) = sub_command_group
                         .commands
                         .iter()
-                        .find(|c| c.name == option.name)
+                        .find(|c| c.get_name() == option.name)
                         .cloned()
                     {
-                        return Some(sub_command);
+                        if let SubCommand::Command(cmd) = sub_command {
+                            return Some(cmd);
+                        } else {
+                            return None;
+                        }
                     }
                 } else {
                     return None;
