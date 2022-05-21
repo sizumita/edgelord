@@ -2,6 +2,8 @@ Edge Computing + chūnibyō = Edgelord ✨👿
 
 # Edgelord
 
+<img src="https://img.shields.io/github/workflow/status/sizumita/edgelord/CI" />
+
 **Edgelord is now working. You can contribute for it.**
 
 Edgelord is a Rust library for cloudflare workers. 
