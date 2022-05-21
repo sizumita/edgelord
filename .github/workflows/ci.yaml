@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build_cache:
+  build_cache_wasm:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,11 +25,30 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-wasm-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build workspace
         run: |
           cargo build --target=wasm32-unknown-unknown
+
+  build_cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build workspace
+        run: |
           cargo build
 
   fmt:
