@@ -1,3 +1,4 @@
+use crate::permission::PermissionFlagBits;
 use crate::utils::parse_i18n;
 use proc_macro::TokenStream;
 use syn::spanned::Spanned;
@@ -8,6 +9,7 @@ pub(crate) struct CommandGroupMeta {
     pub description: String,
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
+    pub default_permissions: Option<PermissionFlagBits>,
 }
 
 pub(crate) fn parse_command_group(
@@ -27,6 +29,15 @@ pub(crate) fn parse_command_group(
     let i18n_descriptions = parse_i18n(args.i18n_descriptions);
     let function_name = std::mem::replace(&mut func.sig.ident, syn::parse_quote! { inner });
     let visibility = &func.vis;
+    let default_permissions = {
+        match args.default_permissions {
+            None => quote::quote! {None},
+            Some(x) => {
+                let y = x.bits().bits();
+                quote::quote! {Some(#y)}
+            }
+        }
+    };
 
     Ok(TokenStream::from(quote::quote! {
         #visibility fn #function_name() -> ::edgecord::application_command::CommandGroup {
@@ -37,7 +48,8 @@ pub(crate) fn parse_command_group(
                 description: #description.to_string(),
                 i18n_names: #i18n_names,
                 i18n_descriptions: #i18n_descriptions,
-                commands: inner()
+                commands: inner(),
+                default_permissions: #default_permissions,
             }
         }
     }))

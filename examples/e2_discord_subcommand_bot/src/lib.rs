@@ -25,7 +25,7 @@ pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> R
 }
 
 #[group(description = "show animal emoji")]
-fn animals() -> Vec<Command> {
+pub fn animals() -> Vec<Command> {
     vec![cat_emoji(), dog_emoji()]
 }
 

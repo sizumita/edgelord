@@ -61,3 +61,9 @@ mod tests {
         assert_eq!(serde_json::to_string(&Locales::Ja).unwrap(), "\"ja\"")
     }
 }
+
+impl From<Locales> for String {
+    fn from(locale: Locales) -> Self {
+        serde_json::to_string(&locale).unwrap()
+    }
+}

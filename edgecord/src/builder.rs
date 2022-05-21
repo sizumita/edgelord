@@ -1,4 +1,4 @@
-use crate::application_command::Command;
+use crate::application_command::{Command, CommandGroup};
 use crate::handler::InteractionHandler;
 use ed25519_dalek::PublicKey;
 
@@ -8,6 +8,7 @@ A builder for [`InteractionHandler`].
 #[derive(Default)]
 pub struct CommandHandlerBuilder {
     commands: Vec<Command>,
+    groups: Vec<CommandGroup>,
     public_key: Option<String>,
     token: Option<String>,
     application_id: Option<String>,
@@ -24,6 +25,15 @@ impl CommandHandlerBuilder {
     **/
     pub fn command(&mut self, command: Command) -> &mut Self {
         self.commands.push(command);
+        self
+    }
+
+    /**
+    Register command group for [`InteractionHandler`].
+    You can create [`CommandGroup`] with `group` macro.
+    **/
+    pub fn group(&mut self, group: CommandGroup) -> &mut Self {
+        self.groups.push(group);
         self
     }
 
@@ -59,6 +69,7 @@ impl CommandHandlerBuilder {
     pub fn build(&mut self) -> Result<InteractionHandler, Box<dyn std::error::Error>> {
         Ok(InteractionHandler {
             commands: self.commands.clone(),
+            groups: self.groups.clone(),
             public_key: PublicKey::from_bytes(&*hex::decode(
                 self.public_key.clone().unwrap().as_bytes(),
             )?)?,

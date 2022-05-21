@@ -8,6 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 worker = "0.0.9"
+serde = {version = "1.0.137", features = ["derive"]}
 
 edgecord = { path = "../../edgecord"}
 edgelord = { path = "../../edgelord"}

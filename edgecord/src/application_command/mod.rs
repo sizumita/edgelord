@@ -4,7 +4,8 @@ pub mod i18n;
 pub mod option;
 
 use futures::future::LocalBoxFuture;
-use serde::Serialize;
+use serde::ser::SerializeStruct;
+use serde::{Serialize, Serializer};
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
@@ -106,5 +107,45 @@ pub struct CommandGroup {
     pub i18n_names: I18nMap,
     pub description: String,
     pub i18n_descriptions: I18nMap,
+    pub default_permissions: Option<u64>,
+
     pub commands: Vec<Command>,
+}
+
+impl Serialize for CommandGroup {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("CommandGroup", 6)?;
+        state.serialize_field("name", self.name.as_str())?;
+        state.serialize_field("description", self.description.as_str())?;
+
+        if let Some(map) = self.i18n_names.clone() {
+            state.serialize_field("name_localizations", &map)?;
+        } else {
+            state.skip_field("name_localizations")?;
+        }
+
+        if let Some(map) = self.i18n_descriptions.clone() {
+            state.serialize_field("description_localizations", &map)?;
+        } else {
+            state.skip_field("description_localizations")?;
+        }
+
+        if let Some(permissions) = self.default_permissions {
+            state.serialize_field("default_member_permissions", &permissions)?;
+        } else {
+            state.skip_field("default_member_permissions")?;
+        }
+
+        let options = self
+            .commands
+            .iter()
+            .map(|command| command.clone().into())
+            .collect::<Vec<CommandAsSubCommand>>();
+        state.serialize_field("options", &options)?;
+
+        state.end()
+    }
 }

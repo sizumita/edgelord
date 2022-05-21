@@ -1,4 +1,4 @@
-use crate::application_command::{Choice, I18nMap};
+use crate::application_command::{Choice, Command, I18nMap};
 use crate::Error;
 use serde::Serialize;
 use twilight_model::application::command::CommandOptionType;
@@ -24,6 +24,35 @@ pub struct CommandOption {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub choices: Vec<Choice>,
     pub required: bool,
+}
+
+#[derive(Clone, Serialize)]
+pub struct CommandAsSubCommand {
+    #[serde(rename = "type")]
+    pub option_type: CommandOptionType,
+    pub name: String,
+    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "name_localizations")]
+    pub i18n_names: I18nMap,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        rename = "description_localizations"
+    )]
+    pub i18n_descriptions: I18nMap,
+    options: Vec<CommandOption>,
+}
+
+impl From<Command> for CommandAsSubCommand {
+    fn from(command: Command) -> Self {
+        Self {
+            option_type: CommandOptionType::SubCommand,
+            name: command.name,
+            description: command.description,
+            i18n_names: command.i18n_names,
+            i18n_descriptions: command.i18n_descriptions,
+            options: command.options,
+        }
+    }
 }
 
 /**

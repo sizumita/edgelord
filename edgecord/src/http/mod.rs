@@ -67,7 +67,7 @@ impl HttpClient {
             403 => Err(Error::Forbidden),
             404 => Err(Error::NotFound),
             // TODO: add errors
-            _ => Err(Error::HttpError),
+            _ => Err(Error::HttpError(response.text().await.unwrap())),
         }
     }
 
@@ -103,7 +103,7 @@ impl HttpClient {
                 |err| match err.status().unwrap_or(reqwest::StatusCode::BAD_REQUEST) {
                     reqwest::StatusCode::FORBIDDEN => Error::Forbidden,
                     reqwest::StatusCode::NOT_FOUND => Error::NotFound,
-                    _ => Error::HttpError,
+                    _ => Error::HttpError(err.to_string()),
                 },
             )
     }

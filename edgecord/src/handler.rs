@@ -1,8 +1,10 @@
-use crate::application_command::{ChatInputCommandContext, Command};
+use crate::application_command::{ChatInputCommandContext, Command, CommandGroup};
 use crate::builder::CommandHandlerBuilder;
 use crate::http::HttpClient;
 use ed25519_dalek::{PublicKey, Signature, Verifier};
-use twilight_model::application::interaction::{Interaction, InteractionType};
+use twilight_model::application::command::CommandOptionType;
+use twilight_model::application::interaction::application_command::CommandOptionValue;
+use twilight_model::application::interaction::{ApplicationCommand, Interaction};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
 use worker::{console_error, Response};
 
@@ -12,6 +14,7 @@ Parse Interaction and dispatch commands.
 **/
 pub struct InteractionHandler {
     pub commands: Vec<Command>,
+    pub groups: Vec<CommandGroup>,
     pub public_key: PublicKey,
     pub token: String,
 }
@@ -26,7 +29,6 @@ impl InteractionHandler {
     let handler = CommandHandler::builder().build("token", "app id", "app public key");
     handler.process(req, env, ctx).await
     ```
-
     **/
     pub fn builder() -> CommandHandlerBuilder {
         CommandHandlerBuilder::new()
@@ -52,29 +54,35 @@ impl InteractionHandler {
                 kind: InteractionResponseType::Pong,
                 data: None,
             }),
-            Interaction::ApplicationCommand(command) => match command.kind {
-                InteractionType::ApplicationCommand => {
-                    match self.get_command(command.data.name.clone()) {
-                        None => {
-                            console_error!("command not found");
-                            panic!("command not found");
-                        }
-                        Some(cmd) => {
-                            let cmd_ctx = ChatInputCommandContext::new(
-                                command.clone(),
-                                env,
-                                ctx,
-                                HttpClient::new(&*self.token),
-                            );
-                            return cmd.invoke(cmd_ctx, command).await;
-                        }
-                    }
-                }
-                _ => {
-                    unreachable!()
-                }
-            },
+            Interaction::ApplicationCommand(command) => {
+                self.handle_application_command(command, req, env, ctx)
+                    .await
+            }
             _ => worker::Response::ok("ok"),
+        }
+    }
+
+    async fn handle_application_command(
+        &self,
+        command: Box<ApplicationCommand>,
+        _req: worker::Request,
+        env: worker::Env,
+        ctx: worker::Context,
+    ) -> worker::Result<worker::Response> {
+        match self.get_command(&command) {
+            None => {
+                console_error!("command not found");
+                panic!("command not found");
+            }
+            Some(cmd) => {
+                let cmd_ctx = ChatInputCommandContext::new(
+                    command.clone(),
+                    env,
+                    ctx,
+                    HttpClient::new(&*self.token),
+                );
+                return cmd.invoke(cmd_ctx, command).await;
+            }
         }
     }
 
@@ -97,7 +105,44 @@ impl InteractionHandler {
             .map_err(|e| e.into())
     }
 
-    pub fn get_command(&self, name: String) -> Option<Command> {
-        self.commands.iter().find(|cmd| cmd.name == name).cloned()
+    pub fn get_command(&self, command: &ApplicationCommand) -> Option<Command> {
+        let is_subcommand_group = command
+            .data
+            .options
+            .iter()
+            .any(|option| option.value.kind() == CommandOptionType::SubCommandGroup);
+        if is_subcommand_group {
+            if let Some(option) = command
+                .data
+                .options
+                .iter()
+                .find(|option| option.value.kind() == CommandOptionType::SubCommandGroup)
+                .cloned()
+            {
+                if let (Some(sub_command_group), CommandOptionValue::SubCommandGroup(options)) = (
+                    self.groups.iter().find(|g| g.name == option.name).cloned(),
+                    option.value,
+                ) {
+                    let option = options.first().cloned().unwrap();
+                    if let Some(sub_command) = sub_command_group
+                        .commands
+                        .iter()
+                        .find(|c| c.name == option.name)
+                        .cloned()
+                    {
+                        return Some(sub_command);
+                    }
+                } else {
+                    return None;
+                }
+            } else {
+                return None;
+            }
+        }
+
+        self.commands
+            .iter()
+            .find(|cmd| cmd.name == command.data.name)
+            .cloned()
     }
 }
