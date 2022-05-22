@@ -109,11 +109,13 @@ impl InteractionHandler {
         command: &ApplicationCommand,
     ) -> Option<(Command, Vec<CommandDataOption>)> {
         for group in &self.groups {
+            if group.name != command.data.name {
+                continue;
+            }
             let commands = command
                 .data
                 .options
                 .iter()
-                .filter(|x| x.name == group.name)
                 .filter_map(|x| group.get_command(x.clone()))
                 .collect::<Vec<_>>();
             if let Some(cmd) = commands.first() {
