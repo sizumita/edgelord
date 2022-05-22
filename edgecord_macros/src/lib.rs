@@ -1,76 +1,3 @@
-//! # Command Metadata Macro
-//!
-//! You can define application command using this macro.
-//!
-//! ## Command Arguments
-//!
-//! - `name`: command default name
-//! - `description`: command default description
-//! - `i18n_names`: command i18n names HashMap generate function name. () -> HashMap<&'static str, String>. See https://discord.com/developers/docs/reference#locales
-//! - `i18n_descriptions`: command i18n descriptions HashMap generate function name. () -> HashMap<&'static str, String>.
-//!
-//! ## Command Option Arguments
-//!
-//! - `name`: command option default name
-//! - `description`: command option default description
-//! - `i18n_names`: command option i18n names HashMap generate function name. () -> HashMap<&'static str, String>. See https://discord.com/developers/docs/reference#locales
-//! - `i18n_descriptions`: command option i18n descriptions HashMap generate function name. () -> HashMap<&'static str, String>.
-//!
-//! # Examples
-//!
-//! ```ignore
-//! use edgecord::{ChatInputCommandContext, InteractionResponse, command};
-//!
-//! #[command(name = "help", description = "show help message")]
-//! async fn help_message(
-//!     ctx: ChatInputCommandContext,
-//!     #[description = "command group"]
-//!     group: Option<String>,
-//!
-//! ) -> InteractionResponse {
-//!     ctx.message("this is help message!")
-//! }
-//! ```
-//!
-//! # Command Option Choices
-//!
-//! You can use [`Choiceable`] derive for enum and use command option type.
-//!
-//! # Example
-//!
-//! ```ignore
-//! use edgecord::{ChatInputCommandContext, InteractionResponse, command, Choiceable};
-//!
-//! #[derive(Choiceable)]
-//! enum StringChoices {
-//!     Dog,
-//!     #[choice(rename = "🐱")]
-//!     Cat,
-//!     #[choice(i18n_names = "some_i18n_func")]
-//!     Bull,
-//! }
-//!
-//! #[derive(Choiceable)]
-//! #[repr(u8)]
-//! #[choice(value_type = "integer")] // "float" to f64
-//! enum IntChoices {
-//!     Egg = 12,
-//! }
-//!
-//! ```
-//!
-//! # Command DefaultPermissions
-//!
-//! You can set default permissions for command with `default_permissions(permission, ...)`.
-//!
-//! ```ignore
-//!
-//! #[edgecord::command(name = "remove_role", description = "remove your role", default_permissions(manage_roles))]
-//! async fn remove_role(ctx: edgecord::Context) -> edgecord::InteractionResponse {
-//!     ctx.message("removed your roles!")
-//! }
-//! ```
-//!
 mod choice;
 mod command;
 mod command_group;
@@ -94,8 +21,9 @@ The function must return edgecord::InteractionResponse.
 
 - `name`: Set the command name. If you use command as group member, It is used for subcommand name.
 - `description`: The description of slash command(or sub command). In the future you will be able to use doc as description.
-- `i18n_names`: The function that returns I18nMap for localization command(or subcommand) name.
-- `i18n_descriptions`: The function that returns I18nMap for localization command description.
+- `i18n_names`: The function that returns HashMap<Locales, String> for localization command(or subcommand) name.
+- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization command description.
+- `default_permissions`: The permissions that member have to have when he uses this command. If this command is used as subcommand, this field is ignored.
 
 # Function Parameter Attribute Arguments
 
@@ -110,8 +38,8 @@ You can add these arguments by using `option(...)` attribute.
 
 - `name`: Set the option name. If you don't set, framework uses argument name.
 - `description`: Set the option description. You have to add it for arguments.
-- `i18n_names`: The function that returns I18nMap for localization option name.
-- `i18n_descriptions`: The function that returns I18nMap for localization option description.
+- `i18n_names`: The function that returns HashMap<Locales, String> for localization option name.
+- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization option description.
 - `required`: This is flag.
 TODO: add params
 
@@ -159,8 +87,9 @@ You can return SubCommand::Group and SubCommand::Command but you can't return Su
 
 - `name`: Set the group name. If you use command as group member, It is used for group.
 - `description`: The description of group. In the future you will be able to use doc as description.
-- `i18n_names`: The function that returns I18nMap for localization group name.
-- `i18n_descriptions`: The function that returns I18nMap for localization group description.
+- `i18n_names`: The function that returns HashMap<Locales, String> for localization group name.
+- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization group description.
+- `default_permissions`: The permissions that member have to have when he uses this command. If this command is used as subcommand, this field is ignored.
 
 ```ignore
 // This group has SubCommand::Group, so it have to be command.
@@ -189,6 +118,19 @@ pub fn group(args: TokenStream, func: TokenStream) -> TokenStream {
 
 /**
 This is a macro that makes enum to command option.
+
+You can `choice(...)` macro in Choiceable.
+
+# Macro Arguments
+
+- `value_type`: Set value type for the enum. You can use `"string"`, `"integer"` and `"float"`.
+
+# Function Parameter Attribute Arguments
+
+- `name`: set the name for the choice.
+- `value`: set the value for the choice.
+- `i18n_names`: The function that returns HashMap<Locales, String> for localization choice name.
+
 
 ```ignore
 #[derive(edgecord::Choiceable)]
