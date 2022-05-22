@@ -1,9 +1,8 @@
-use crate::application_command::{ChatInputCommandContext, Command, CommandGroup, SubCommand};
+use crate::application_command::{ChatInputCommandContext, Command, CommandGroup};
 use crate::builder::CommandHandlerBuilder;
 use crate::http::HttpClient;
 use ed25519_dalek::{PublicKey, Signature, Verifier};
-use twilight_model::application::command::CommandOptionType;
-use twilight_model::application::interaction::application_command::CommandOptionValue;
+use twilight_model::application::interaction::application_command::CommandDataOption;
 use twilight_model::application::interaction::{ApplicationCommand, Interaction};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
 use worker::{console_error, Response};
@@ -74,14 +73,14 @@ impl InteractionHandler {
                 console_error!("command not found");
                 panic!("command not found");
             }
-            Some(cmd) => {
+            Some((cmd, options)) => {
                 let cmd_ctx = ChatInputCommandContext::new(
                     command.clone(),
                     env,
                     ctx,
                     HttpClient::new(&*self.token),
                 );
-                return cmd.invoke(cmd_ctx, command).await;
+                return cmd.invoke(cmd_ctx, command, options).await;
             }
         }
     }
@@ -105,48 +104,28 @@ impl InteractionHandler {
             .map_err(|e| e.into())
     }
 
-    pub fn get_command(&self, command: &ApplicationCommand) -> Option<Command> {
-        let is_subcommand_group = command
-            .data
-            .options
-            .iter()
-            .any(|option| option.value.kind() == CommandOptionType::SubCommandGroup);
-        if is_subcommand_group {
-            if let Some(option) = command
+    pub fn get_command(
+        &self,
+        command: &ApplicationCommand,
+    ) -> Option<(Command, Vec<CommandDataOption>)> {
+        for group in &self.groups {
+            let commands = command
                 .data
                 .options
                 .iter()
-                .find(|option| option.value.kind() == CommandOptionType::SubCommandGroup)
-                .cloned()
-            {
-                if let (Some(sub_command_group), CommandOptionValue::SubCommandGroup(options)) = (
-                    self.groups.iter().find(|g| g.name == option.name).cloned(),
-                    option.value,
-                ) {
-                    let option = options.first().cloned().unwrap();
-                    if let Some(sub_command) = sub_command_group
-                        .commands
-                        .iter()
-                        .find(|c| c.get_name() == option.name)
-                        .cloned()
-                    {
-                        if let SubCommand::Command(cmd) = sub_command {
-                            return Some(cmd);
-                        } else {
-                            return None;
-                        }
-                    }
-                } else {
-                    return None;
-                }
-            } else {
-                return None;
+                .filter(|x| x.name == group.name)
+                .filter_map(|x| group.get_command(x.clone()))
+                .collect::<Vec<_>>();
+            if let Some(cmd) = commands.first() {
+                return Some(cmd.clone());
             }
         }
 
-        self.commands
+        self
+            .commands
             .iter()
             .find(|cmd| cmd.name == command.data.name)
             .cloned()
+            .map(|cmd| (cmd, command.data.options.clone()))
     }
 }

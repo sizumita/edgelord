@@ -135,12 +135,12 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
             };
             let t = option.t.clone();
             quote::quote! {
-                ::edgecord::application_command::context::ChatInputCommandContext::get_option::<#t>(interaction.clone(), #name)
+                #t::from_option(options.iter().find(|x| x.name == #name).cloned().unwrap().value).unwrap()
             }
         })
         .collect::<Vec<_>>();
     quote::quote! {
-        ::std::rc::Rc::new(move |ctx, interaction| Box::pin(inner(ctx, #( #args, )*)))
+        ::std::rc::Rc::new(move |ctx, interaction, options| Box::pin(inner(ctx, #( #args, )*)))
     }
 }
 

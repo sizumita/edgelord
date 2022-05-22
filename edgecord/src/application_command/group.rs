@@ -1,7 +1,10 @@
-use crate::application_command::{I18nMap, SubCommand};
+use crate::application_command::{Command, I18nMap, SubCommand};
 use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 use twilight_model::application::command::CommandOptionType;
+use twilight_model::application::interaction::application_command::{
+    CommandDataOption, CommandOptionValue,
+};
 
 #[derive(Clone)]
 pub struct CommandGroup {
@@ -44,6 +47,48 @@ impl Serialize for CommandGroup {
         state.serialize_field("options", &self.commands)?;
 
         state.end()
+    }
+}
+
+impl CommandGroup {
+    pub fn get_command(
+        &self,
+        option: CommandDataOption,
+    ) -> Option<(Command, Vec<CommandDataOption>)> {
+        match option.value {
+            CommandOptionValue::SubCommand(options) => {
+                if let Some(SubCommand::Command(command)) = self
+                    .commands
+                    .iter()
+                    .filter(|x| !x.is_group())
+                    .find(|x| x.get_name() == option.name)
+                    .cloned()
+                {
+                    Some((command, options))
+                } else {
+                    None
+                }
+            }
+            CommandOptionValue::SubCommandGroup(subcommands) => {
+                if let Some(SubCommand::Group(group)) = self
+                    .commands
+                    .iter()
+                    .filter(|x| x.is_group())
+                    .find(|x| x.get_name() == option.name)
+                    .cloned()
+                {
+                    subcommands
+                        .iter()
+                        .filter_map(|x| group.get_command(x.clone()))
+                        .collect::<Vec<_>>()
+                        .first()
+                        .cloned()
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
     }
 }
 

@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use twilight_model::application::command::CommandType;
+use twilight_model::application::interaction::application_command::CommandDataOption;
 use twilight_model::application::interaction::ApplicationCommand;
 
 use crate::InteractionResponse;
@@ -24,6 +25,7 @@ type AsyncCommandFn = Rc<
         + Fn(
             ChatInputCommandContext,
             Box<ApplicationCommand>,
+            Vec<CommandDataOption>,
         ) -> LocalBoxFuture<'static, worker::Result<worker::Response>>,
 >;
 
@@ -97,8 +99,9 @@ impl Command {
         &self,
         ctx: ChatInputCommandContext,
         interaction: Box<ApplicationCommand>,
+        options: Vec<CommandDataOption>,
     ) -> InteractionResponse {
-        (self.action)(ctx, interaction).await
+        (self.action)(ctx, interaction, options).await
     }
 }
 
