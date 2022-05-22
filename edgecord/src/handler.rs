@@ -121,8 +121,7 @@ impl InteractionHandler {
             }
         }
 
-        self
-            .commands
+        self.commands
             .iter()
             .find(|cmd| cmd.name == command.data.name)
             .cloned()

@@ -45,7 +45,7 @@ TODO: add params
 
 # Examples
 
-```
+```ignore
 fn echo_names() -> std::collections::HashMap<Locales, String> {
     std::collections::HashMap::from([(Locales::Ja, "おうむ返し".to_string())])
 }
