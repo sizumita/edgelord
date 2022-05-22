@@ -19,28 +19,28 @@ The function must return edgecord::InteractionResponse.
 
 # Macro Arguments
 
-- `name`: Set the command name. If you use command as group member, It is used for subcommand name.
-- `description`: The description of slash command(or sub command). In the future you will be able to use doc as description.
-- `i18n_names`: The function that returns HashMap<Locales, String> for localization command(or subcommand) name.
-- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization command description.
-- `default_permissions`: The permissions that member have to have when he uses this command. If this command is used as subcommand, this field is ignored.
+- `name`: The command name. If you use the command as group member, It is used for subcommand name.
+- `description`: The description of the slash command(or sub command). In the future you will be able to use doc as description. Required for arguments.
+- `i18n_names`: A function that returns HashMap<Locales, String> of localization command(or subcommand) name.
+- `i18n_descriptions`: A function that returns HashMap<Locales, String> for localization command description.
+- `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand, this field is ignored.
 
 # Function Parameter Attribute Arguments
 
-`ChatInputContext` must be command function first parameter.
-You can't add any attributes for context.
+`ChatInputContext` must be the first parameter of the command function.
+You can't add any attributes to context.
 
-After second parameters, they are placed as slashcommand options.
+From second parameters onwards, they are used as slashcommand options.
 
 The option type must be in `[String, i64, f64, bool, Id<ChannelMaker>, Id<RoleMaker>, Id<UserMaker>, Id<GenericMaker>, Id<AttachmentMaker> or Choiceable]`
 
 You can add these arguments by using `option(...)` attribute.
 
-- `name`: Set the option name. If you don't set, framework uses argument name.
-- `description`: Set the option description. You have to add it for arguments.
-- `i18n_names`: The function that returns HashMap<Locales, String> for localization option name.
-- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization option description.
-- `required`: This is flag.
+- `name`: The command name.
+- `description`: The description of the option. Required for arguments.
+- `i18n_names`: A function that returns HashMap<Locales, String> of localization option name.
+- `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization option description.
+- `required`: This is a flag.
 TODO: add params
 
 # Examples
@@ -77,22 +77,22 @@ pub fn command(args: TokenStream, func: TokenStream) -> TokenStream {
 }
 
 /**
-This macro transforms a function into edgecord slash command group.
+This macro transforms a function into edgecord slash command group or slash command that has subcommand.
 
 The function must return Vec<edgecord::command::SubCommand>.
 
-You can return SubCommand::Group and SubCommand::Command but you can't return SubCommand::Group if the parent group is in other group.
+You can return either SubCommand::Group or SubCommand::Command, but you can't return SubCommand::Group if the parent group is in other group.
 
 # Macro Arguments
 
-- `name`: Set the group name. If you use command as group member, It is used for group.
-- `description`: The description of group. In the future you will be able to use doc as description.
-- `i18n_names`: The function that returns HashMap<Locales, String> for localization group name.
-- `i18n_descriptions`: The function that returns HashMap<Locales, String> for localization group description.
-- `default_permissions`: The permissions that member have to have when he uses this command. If this command is used as subcommand, this field is ignored.
+- `name`: The group name. If you use the command as group member, It is used for group name.
+- `description`: The description of the group. In the future you will be able to use doc as description. Required for arguments.
+- `i18n_names`: A function that returns HashMap<Locales, String> of localization group name.
+- `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization group description.
+- `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand group, this field is ignored.
 
 ```ignore
-// This group has SubCommand::Group, so it have to be command.
+// This group has a SubCommand::Group, so it has to be command.
 #[group(description = "show animal emojis")]
 fn animal_group() -> Vec<SubCommand> {
     vec![SubCommand::Command(dog_command()), SubCommand::Command(cat_command()), SubCommand::Group(rabbit_group())]
@@ -117,9 +117,9 @@ pub fn group(args: TokenStream, func: TokenStream) -> TokenStream {
 }
 
 /**
-This is a macro that makes enum to command option.
+This is a macro that turns an enum into a command option.
 
-You can `choice(...)` macro in Choiceable.
+You can use the `choice(...)` macro in Choiceable.
 
 # Macro Arguments
 
@@ -127,9 +127,9 @@ You can `choice(...)` macro in Choiceable.
 
 # Function Parameter Attribute Arguments
 
-- `name`: set the name for the choice.
-- `value`: set the value for the choice.
-- `i18n_names`: The function that returns HashMap<Locales, String> for localization choice name.
+- `name`: The choice name.
+- `value`: The choice value. Required for arguments.
+- `i18n_names`: A function that returns HashMap<Locales, String> of localization choice name.
 
 
 ```ignore
@@ -142,7 +142,7 @@ enum StringChoices {
 }
 
 #[derive(edgecord::Choiceable)]
-#[choice(value_type = "integer")] // string, integer and float is available
+#[choice(value_type = "integer")] // string, integer and float are available
 enum IntegerChoices {
     #[choice(value = 1)]
     Dog,
