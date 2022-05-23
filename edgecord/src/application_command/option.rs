@@ -1,12 +1,42 @@
 use crate::application_command::{Choice, Command, I18nMap};
 use crate::Error;
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 use twilight_model::application::command::CommandOptionType;
 use twilight_model::application::interaction::application_command::CommandOptionValue;
 use twilight_model::id::marker::{
     AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker,
 };
 use twilight_model::id::Id;
+
+#[derive(Debug, Clone)]
+pub enum RangeValue {
+    Integer(i64),
+    Float(f64),
+}
+
+impl From<i64> for RangeValue {
+    fn from(value: i64) -> Self {
+        RangeValue::Integer(value)
+    }
+}
+
+impl From<f64> for RangeValue {
+    fn from(value: f64) -> Self {
+        RangeValue::Float(value)
+    }
+}
+
+impl Serialize for RangeValue {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            RangeValue::Integer(i) => serializer.serialize_i64(*i),
+            RangeValue::Float(f) => serializer.serialize_f64(*f),
+        }
+    }
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct CommandOption {
@@ -24,6 +54,10 @@ pub struct CommandOption {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub choices: Vec<Choice>,
     pub required: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_value: Option<RangeValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_value: Option<RangeValue>,
 }
 
 #[derive(Clone, Serialize)]
@@ -63,8 +97,8 @@ pub trait FromCommandOptionValue {
     where
         Self: Sized;
     fn get_option_type() -> CommandOptionType;
-    fn has_choices() -> bool {
-        false
+    fn choices() -> Vec<Choice> {
+        vec![]
     }
 }
 

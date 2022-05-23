@@ -44,11 +44,12 @@ pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
 #[command(name = "animal", description = "show animal image")]
 pub async fn animal_image(
     ctx: ChatInputCommandContext,
-    #[option(description = "the animal name you want to see", required)] name: Animals,
+    #[option(description = "the animal name you want to see")] name: Animals,
+    #[option(description = "image count", max_value = 32)] count: Option<i64>,
 ) -> InteractionResponse {
     match name {
-        Animals::Cat => ctx.message("cat image"),
-        Animals::Dog => ctx.message("dog image"),
+        Animals::Cat => ctx.message(&*"cat image".repeat(count.unwrap_or(1) as usize)),
+        Animals::Dog => ctx.message(&*"dog image".repeat(count.unwrap_or(1) as usize)),
     }
 }
 

@@ -31,7 +31,3 @@ pub struct Choice {
     pub i18n_names: I18nMap,
     pub value: ChoiceValue,
 }
-
-pub trait ChoiceTrait {
-    fn choices() -> Vec<Choice>;
-}

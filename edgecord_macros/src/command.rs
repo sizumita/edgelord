@@ -1,17 +1,16 @@
 use crate::permission::PermissionFlagBits;
 use crate::utils::parse_i18n;
 use crate::validate::validate_option;
-use darling::util::Flag;
 #[allow(unused_imports)]
 use darling::FromMeta as _;
 use proc_macro::TokenStream;
+use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned as _;
 use syn::token::Comma;
 use syn::FnArg;
 
-#[derive(Default, Debug, darling::FromMeta)]
-#[darling(default)]
+#[derive(Debug, darling::FromMeta)]
 pub(crate) struct CommandMeta {
     pub name: Option<String>,
     pub description: String,
@@ -20,18 +19,19 @@ pub(crate) struct CommandMeta {
     pub default_permissions: Option<PermissionFlagBits>,
 }
 
-#[derive(Default, Debug, darling::FromMeta)]
-#[darling(default)]
+#[derive(Debug, darling::FromMeta)]
 pub(crate) struct OptionMeta {
     pub name: Option<String>,
     pub description: String,
     pub i18n_names: Option<syn::Path>,
     pub i18n_descriptions: Option<syn::Path>,
+    #[allow(dead_code)]
     pub autocomplete: Option<syn::Path>,
-    pub required: Flag,
+    pub min_value: Option<syn::Lit>,
+    pub max_value: Option<syn::Lit>,
 }
 
-#[derive(Default, Debug, darling::FromMeta)]
+#[derive(Debug, darling::FromMeta)]
 pub(crate) struct OptionMetaWrapped {
     pub option: OptionMeta,
 }
@@ -133,9 +133,15 @@ fn parse_action(options: Vec<CommandOption>) -> proc_macro2::TokenStream {
                 None => option.name.to_string(),
                 Some(x) => x.clone(),
             };
-            let t = option.t.clone();
-            quote::quote! {
-                #t::from_option(options.iter().find(|x| x.name == #name).cloned().unwrap().value).unwrap()
+            let (required, t) = parse_option_type(&option.t);
+            if required {
+                quote::quote! {
+                    #t::from_option(options.iter().find(|x| x.name == #name).cloned().unwrap().value).unwrap()
+                }
+            } else {
+                quote::quote! {
+                    options.iter().find(|x| x.name == #name).cloned().map(|value| #t::from_option(value.value).unwrap())
+                }
             }
         })
         .collect::<Vec<_>>();
@@ -153,24 +159,54 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
         .clone()
         .unwrap_or_else(|| option.name.to_string());
     let description = option.meta.description.clone();
-    let t = &option.t;
-    let required = &option.meta.required.is_present();
+    let (required, ty) = parse_option_type(&option.t);
+    let min_value = parse_range_value(&option.meta.min_value);
+    let max_value = parse_range_value(&option.meta.max_value);
 
     quote::quote! {
         ::edgecord::application_command::CommandOption {
-            option_type: #t::get_option_type(),
+            option_type: #ty::get_option_type(),
             name: #name.to_string(),
             description: #description.to_string(),
             i18n_names: #i18n_names,
             i18n_descriptions: #i18n_descriptions,
-            choices: {
-                if #t::has_choices() {
-                    <#t as ::edgecord::application_command::ChoiceTrait>::choices()
-                } else {
-                    vec![]
-                }
-            },
+            choices: #ty::choices(),
             required: #required,
+            min_value: #min_value,
+            max_value: #max_value,
         }
+    }
+}
+
+fn parse_range_value(value: &Option<syn::Lit>) -> proc_macro2::TokenStream {
+    match value {
+        None => quote::quote! {None},
+        Some(x) => {
+            let v = x.to_token_stream();
+            quote::quote! {Some(#v.into())}
+        }
+    }
+}
+
+fn parse_option_type(ty: &syn::Type) -> (bool, syn::Type) {
+    fn path_is_option(path: &syn::Path) -> bool {
+        path.leading_colon.is_none()
+            && path.segments.len() == 1
+            && path.segments.first().unwrap().ident == "Option"
+    }
+
+    match ty {
+        syn::Type::Path(typepath) if typepath.qself.is_none() && path_is_option(&typepath.path) => {
+            let type_params = typepath.path.segments.first().unwrap().clone().arguments;
+            let generic_arg = match type_params {
+                syn::PathArguments::AngleBracketed(params) => params.args.first().unwrap().clone(),
+                _ => return (true, ty.clone()),
+            };
+            match generic_arg {
+                syn::GenericArgument::Type(ty) => (false, ty),
+                _ => (true, ty.clone()),
+            }
+        }
+        _ => (true, ty.clone()),
     }
 }

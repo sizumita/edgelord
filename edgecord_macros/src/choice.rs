@@ -80,9 +80,15 @@ pub(crate) enum Choice {
 impl Choice {
     pub fn get_name(&self) -> String {
         match self {
-            Choice::String { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
-            Choice::Integer { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
-            Choice::Float { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
+            Choice::String { meta, ident } => {
+                meta.clone().rename.unwrap_or_else(|| ident.to_string())
+            }
+            Choice::Integer { meta, ident } => {
+                meta.clone().rename.unwrap_or_else(|| ident.to_string())
+            }
+            Choice::Float { meta, ident } => {
+                meta.clone().rename.unwrap_or_else(|| ident.to_string())
+            }
         }
     }
 }
@@ -182,14 +188,6 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
     let option_type = choice_type.to_option_type();
 
     Ok(TokenStream::from(quote::quote! {
-        impl ::edgecord::application_command::ChoiceTrait for #enum_name {
-            fn choices() -> Vec<::edgecord::application_command::Choice> {
-                vec![
-                    #( #parsed, )*
-                ]
-            }
-        }
-
         use ::edgecord::model::application::interaction::application_command::{CommandOptionValue};
         use ::edgecord::model::application::command::CommandOptionType;
 
@@ -206,8 +204,10 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
                 CommandOptionType::#option_type
             }
 
-            fn has_choices() -> bool {
-                true
+            fn choices() -> Vec<::edgecord::application_command::Choice> {
+                vec![
+                    #( #parsed, )*
+                ]
             }
 
         }

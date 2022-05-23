@@ -32,7 +32,9 @@ You can't add any attributes to context.
 
 From second parameters onwards, they are used as slashcommand options.
 
-The option type must be in `[String, i64, f64, bool, Id<ChannelMaker>, Id<RoleMaker>, Id<UserMaker>, Id<GenericMaker>, Id<AttachmentMaker> or Choiceable]`
+The option type must be in `[String, i64, f64, bool, Id<ChannelMaker>, Id<RoleMaker>, Id<UserMaker>, Id<GenericMaker>, Id<AttachmentMaker> or Choiceable]`.
+
+The option is required in default. You can use Option<T> for option type. If you use Option, the option will be not required.
 
 You can add these arguments by using `option(...)` attribute.
 
@@ -40,8 +42,8 @@ You can add these arguments by using `option(...)` attribute.
 - `description`: The description of the option. Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization option name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization option description.
-- `required`: This is a flag.
-TODO: add params
+- `min_value`: The minimum value permitted. It is available if the option is i64 or u64.
+- `max_value`: The maximum value permitted. It is available if the option is i64 or u64.
 
 # Examples
 
