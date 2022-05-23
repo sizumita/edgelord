@@ -1,3 +1,4 @@
+use crate::channel_type::ChannelTypes;
 use crate::permission::PermissionFlagBits;
 use crate::utils::parse_i18n;
 use crate::validate::validate_option;
@@ -29,6 +30,7 @@ pub(crate) struct OptionMeta {
     pub autocomplete: Option<syn::Path>,
     pub min_value: Option<syn::Lit>,
     pub max_value: Option<syn::Lit>,
+    pub channel_types: Option<ChannelTypes>,
 }
 
 #[derive(Debug, darling::FromMeta)]
@@ -162,6 +164,13 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
     let (required, ty) = parse_option_type(&option.t);
     let min_value = parse_range_value(&option.meta.min_value);
     let max_value = parse_range_value(&option.meta.max_value);
+    let channel_types = {
+        if let Some(x) = option.meta.channel_types.clone().map(|x| x.to_vec_token()) {
+            quote::quote!(Some(#x))
+        } else {
+            quote::quote!(None)
+        }
+    };
 
     quote::quote! {
         ::edgecord::application_command::CommandOption {
@@ -174,6 +183,7 @@ fn parse_option_meta(option: &CommandOption) -> proc_macro2::TokenStream {
             required: #required,
             min_value: #min_value,
             max_value: #max_value,
+            channel_types: #channel_types
         }
     }
 }

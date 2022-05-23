@@ -82,7 +82,8 @@ impl HttpClient {
         T: DeserializeOwned,
         B: Serialize,
     {
-        self._http
+        let response = self
+            ._http
             .request(
                 reqwest::Method::from_str(&*method.to_string()).unwrap(),
                 &*format!("{}{}", BASE_URL, route),
@@ -96,15 +97,15 @@ impl HttpClient {
             )
             .send()
             .await
-            .unwrap()
-            .json::<T>()
-            .await
-            .map_err(
-                |err| match err.status().unwrap_or(reqwest::StatusCode::BAD_REQUEST) {
-                    reqwest::StatusCode::FORBIDDEN => Error::Forbidden,
-                    reqwest::StatusCode::NOT_FOUND => Error::NotFound,
-                    _ => Error::HttpError(err.to_string()),
-                },
-            )
+            .unwrap();
+
+        if response.status().clone().is_success() {
+            return Ok(response.json::<T>().await.unwrap());
+        }
+        match response.status() {
+            reqwest::StatusCode::FORBIDDEN => Err(Error::Forbidden),
+            reqwest::StatusCode::NOT_FOUND => Err(Error::NotFound),
+            _ => Err(Error::HttpError(response.text().await.unwrap_or_default())),
+        }
     }
 }

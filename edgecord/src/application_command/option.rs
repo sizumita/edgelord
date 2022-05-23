@@ -3,6 +3,7 @@ use crate::Error;
 use serde::{Serialize, Serializer};
 use twilight_model::application::command::CommandOptionType;
 use twilight_model::application::interaction::application_command::CommandOptionValue;
+use twilight_model::channel::ChannelType;
 use twilight_model::id::marker::{
     AttachmentMarker, ChannelMarker, GenericMarker, RoleMarker, UserMarker,
 };
@@ -58,6 +59,8 @@ pub struct CommandOption {
     pub min_value: Option<RangeValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_value: Option<RangeValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel_types: Option<Vec<ChannelType>>,
 }
 
 #[derive(Clone, Serialize)]

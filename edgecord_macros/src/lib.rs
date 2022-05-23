@@ -1,3 +1,4 @@
+mod channel_type;
 mod choice;
 mod command;
 mod command_group;
@@ -23,7 +24,7 @@ The function must return edgecord::InteractionResponse.
 - `description`: The description of the slash command(or sub command). Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization command(or subcommand) name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> for localization command description.
-- `default_permissions`: The permissions that a member has to have when he uses this command. You can add plural permissions like `default_permissions(send_messages, manage_roles)`. The permission name is the snake_case enum member of edgecord::model::guild::Permissions. If this command is used as a subcommand, this field is ignored.
+- `default_permissions(send_messages, ..)`: The permissions that a member has to have when he uses this command. You can add plural permissions like `default_permissions(send_messages, manage_roles)`. The permission name is the snake_case enum member of edgecord::model::guild::Permissions. If this command is used as a subcommand, this field is ignored.
 
 # Function Parameter Attribute Arguments
 
@@ -44,6 +45,7 @@ You can add these arguments by using `option(...)` attribute.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization option description.
 - `min_value`: The minimum value permitted. It is available if the option is i64 or u64.
 - `max_value`: The maximum value permitted. It is available if the option is i64 or u64.
+- `channel_types(guild_text, ..)`: The channel types for the option. The permission name is the snake_case enum member of ::edgecord::models::channel::ChannelType.
 
 # Examples
 
