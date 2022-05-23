@@ -123,7 +123,7 @@ You can use the `choice(...)` macro in Choiceable.
 
 # Macro Arguments
 
-- `value_type`: Set value type for the enum. You can use `"string"`, `"integer"` and `"float"`.
+- `type`: Set value type for the enum. You can use `"string"`, `"integer"` and `"float"`.
 
 # Function Parameter Attribute Arguments
 
@@ -142,7 +142,7 @@ enum StringChoices {
 }
 
 #[derive(edgecord::Choiceable)]
-#[choice(value_type = "integer")] // string, integer and float are available
+#[choice(type = "integer")] // string, integer and float are available
 enum IntegerChoices {
     #[choice(value = 1)]
     Dog,
