@@ -20,7 +20,7 @@ The function must return edgecord::InteractionResponse.
 # Macro Arguments
 
 - `name`: The command name. If you use the command as group member, It is used for subcommand name.
-- `description`: The description of the slash command(or sub command). In the future you will be able to use doc as description. Required for arguments.
+- `description`: The description of the slash command(or sub command). Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization command(or subcommand) name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> for localization command description.
 - `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand, this field is ignored.
@@ -88,7 +88,7 @@ You can return either SubCommand::Group or SubCommand::Command, but you can't re
 # Macro Arguments
 
 - `name`: The group name. If you use the command as group member, It is used for group name.
-- `description`: The description of the group. In the future you will be able to use doc as description. Required for arguments.
+- `description`: The description of the group. Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization group name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization group description.
 - `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand group, this field is ignored.
