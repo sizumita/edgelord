@@ -23,7 +23,7 @@ The function must return edgecord::InteractionResponse.
 - `description`: The description of the slash command(or sub command). Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization command(or subcommand) name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> for localization command description.
-- `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand, this field is ignored.
+- `default_permissions`: The permissions that a member has to have when he uses this command. You can add plural permissions like `default_permissions(send_messages, manage_roles)`. The permission name is the snake_case enum member of edgecord::model::guild::Permissions. If this command is used as a subcommand, this field is ignored.
 
 # Function Parameter Attribute Arguments
 
@@ -52,7 +52,7 @@ fn echo_names() -> std::collections::HashMap<Locales, String> {
     std::collections::HashMap::from([(Locales::Ja, "おうむ返し".to_string())])
 }
 
-#[command(description = "this is description", i18n_names = "echo_names")]
+#[command(description = "this is description", i18n_names = "echo_names", default_permissions(send_messages))]
 async fn echo(
     ctx: ChatInputContext,
     #[choice(description = "echo text", required)]
@@ -91,7 +91,7 @@ You can return either SubCommand::Group or SubCommand::Command, but you can't re
 - `description`: The description of the group. Required for arguments.
 - `i18n_names`: A function that returns HashMap<Locales, String> of localization group name.
 - `i18n_descriptions`: A function that returns HashMap<Locales, String> of localization group description.
-- `default_permissions`: The permissions that a member has to have when he uses this command. If this command is used as a subcommand group, this field is ignored.
+- `default_permissions`: The permissions that a member has to have when he uses this command. You can add plural permissions like `default_permissions(send_messages, manage_roles)`. The permission name is the snake_case enum member of `edgecord::model::guild::Permissions`. If this command is used as a subcommand group, this field is ignored.
 
 ```ignore
 // This group has a SubCommand::Group, so it has to be command.

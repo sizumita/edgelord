@@ -15,7 +15,9 @@ pub mod handler;
 pub mod http;
 pub mod model;
 
+#[doc(inline)]
 pub use async_trait::async_trait;
+#[doc(inline)]
 pub use edgecord_macros::*;
 
 pub use error::Error;
