@@ -53,8 +53,10 @@ pub async fn animal_image(
 }
 
 #[derive(Debug, Choiceable, PartialEq)]
-#[choice(value_type = "integer")]
+#[choice(type = "integer")]
 pub enum Animals {
-    Dog = 12,
-    Cat = 36,
+    #[choice(value = 12)]
+    Dog,
+    #[choice(value = 36)]
+    Cat,
 }

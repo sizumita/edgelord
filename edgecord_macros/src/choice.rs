@@ -3,20 +3,18 @@ use darling::FromMeta;
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use syn::spanned::Spanned;
-use syn::{Data, Expr, Lit};
+use syn::Data;
 
-#[derive(Clone, Default, Debug, darling::FromMeta)]
-#[darling(default)]
-pub(crate) struct ChoiceMeta {
-    pub rename: Option<String>,
-    pub i18n_names: Option<syn::Path>,
-    pub value: Option<String>,
+#[derive(Debug, darling::FromMeta)]
+pub(crate) struct ChoicesMeta {
+    #[darling(rename = "type")]
+    value_type: Option<ChoiceType>,
 }
 
-#[derive(Clone, Default, Debug, darling::FromMeta)]
-#[darling(default)]
-pub(crate) struct ChoiceArgs {
-    pub choice: ChoiceMeta,
+#[derive(Debug, darling::FromMeta)]
+pub(crate) struct ChoicesArgs {
+    #[darling(default)]
+    pub choice: Option<ChoicesMeta>,
 }
 
 #[derive(Clone, Debug, darling::FromMeta, PartialEq)]
@@ -37,22 +35,56 @@ impl ChoiceType {
     }
 }
 
-#[derive(Debug, darling::FromMeta)]
-pub(crate) struct ChoicesMeta {
-    value_type: Option<ChoiceType>,
+#[derive(Clone, Debug, darling::FromMeta)]
+pub(crate) struct ChoiceArgs<T> {
+    pub choice: Option<T>,
 }
 
-#[derive(Debug, darling::FromMeta)]
-pub(crate) struct ChoicesArgs {
-    #[darling(default)]
-    pub choice: Option<ChoicesMeta>,
+#[derive(Default, Clone, Debug, darling::FromMeta)]
+pub(crate) struct StringChoiceMeta {
+    pub rename: Option<String>,
+    pub i18n_names: Option<syn::Path>,
+    pub value: Option<String>,
+}
+
+#[derive(Clone, Debug, darling::FromMeta)]
+pub(crate) struct IntegerChoiceMeta {
+    pub rename: Option<String>,
+    pub i18n_names: Option<syn::Path>,
+    pub value: i64,
+}
+
+#[derive(Clone, Debug, darling::FromMeta)]
+pub(crate) struct FloatChoiceMeta {
+    pub rename: Option<String>,
+    pub i18n_names: Option<syn::Path>,
+    pub value: f64,
 }
 
 #[derive(Clone)]
-pub(crate) struct Choice {
-    pub meta: ChoiceMeta,
-    pub ident: Ident,
-    pub value: String,
+pub(crate) enum Choice {
+    String {
+        meta: StringChoiceMeta,
+        ident: Ident,
+    },
+    Integer {
+        meta: IntegerChoiceMeta,
+        ident: Ident,
+    },
+    Float {
+        meta: FloatChoiceMeta,
+        ident: Ident,
+    },
+}
+
+impl Choice {
+    pub fn get_name(&self) -> String {
+        match self {
+            Choice::String { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
+            Choice::Integer { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
+            Choice::Float { meta, ident } => meta.clone().rename.unwrap_or_else(|| ident.to_string()),
+        }
+    }
 }
 
 pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, syn::Error> {
@@ -65,7 +97,12 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
         .drain(..)
         .map(|attr| attr.parse_meta().map(syn::NestedMeta::Meta))
         .collect::<Result<Vec<_>, _>>()?;
-    let enum_meta = ChoicesArgs::from_list(&enum_attrs)?.choice;
+    let enum_meta = ChoicesArgs::from_list(&enum_attrs)?
+        .choice
+        .unwrap_or(ChoicesMeta {
+            value_type: Some(ChoiceType::String),
+        });
+    let choice_type = enum_meta.value_type.unwrap();
 
     let mut choices = Vec::<Choice>::new();
 
@@ -83,55 +120,47 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
             .map(|attr| attr.parse_meta().map(syn::NestedMeta::Meta))
             .collect::<Result<Vec<_>, _>>()?;
 
-        let value = {
-            if let Some((_, expr)) = variant.discriminant.clone() {
-                if let Expr::Lit(lit) = expr.clone() {
-                    match lit.lit {
-                        Lit::Str(v) => v.value(),
-                        Lit::Int(v) => v.to_string(),
-                        Lit::Float(v) => v.to_string(),
-                        _ => {
-                            return Err(syn::Error::new(
-                                expr.span(),
-                                "choice value must be string, int or float",
-                            ))
-                        }
-                    }
-                } else {
-                    return Err(syn::Error::new(
-                        expr.span(),
-                        "choice value must be string, int or float",
-                    ));
+        choices.push(match choice_type {
+            ChoiceType::String => {
+                let meta = <ChoiceArgs<StringChoiceMeta> as darling::FromMeta>::from_list(&attrs)?
+                    .choice
+                    .unwrap_or_default();
+                Choice::String {
+                    meta,
+                    ident: variant.ident,
                 }
-            } else {
-                variant.ident.to_string()
             }
-        };
-
-        let meta = <ChoiceArgs as darling::FromMeta>::from_list(&attrs)?.choice;
-        choices.push(Choice {
-            meta: meta.clone(),
-            ident: variant.ident,
-            value: meta.value.unwrap_or(value),
+            ChoiceType::Integer => {
+                let meta = <ChoiceArgs<IntegerChoiceMeta> as darling::FromMeta>::from_list(&attrs)?
+                    .choice
+                    .expect("integer choice must have value field");
+                Choice::Integer {
+                    meta,
+                    ident: variant.ident,
+                }
+            }
+            ChoiceType::Float => {
+                let meta = <ChoiceArgs<FloatChoiceMeta> as darling::FromMeta>::from_list(&attrs)?
+                    .choice
+                    .expect("float choice must have value field");
+                Choice::Float {
+                    meta,
+                    ident: variant.ident,
+                }
+            }
         })
     }
 
     let enum_name = &input.ident;
-    let ty = enum_meta
-        .unwrap_or(ChoicesMeta { value_type: None })
-        .value_type
-        .unwrap_or(ChoiceType::String);
-    let parsed = choices
-        .iter()
-        .map(|x| parse_choice(&ty, x))
-        .collect::<Vec<_>>();
+    let parsed = choices.iter().map(parse_choice).collect::<Vec<_>>();
     let matchs = choices
         .clone()
         .iter()
-        .map(|x| parse_choice_matches(enum_name, &ty, x))
+        .map(|x| parse_choice_matches(enum_name, x))
         .collect::<Vec<_>>();
+
     let inject = {
-        match ty {
+        match choice_type {
             ChoiceType::String => quote::quote! {
                 let value = {
                     if let CommandOptionValue::String(value) = value {value} else {return Err(::edgecord::Error::WrongOptionType)}
@@ -150,7 +179,7 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
             },
         }
     };
-    let option_type = ty.to_option_type();
+    let option_type = choice_type.to_option_type();
 
     Ok(TokenStream::from(quote::quote! {
         impl ::edgecord::application_command::ChoiceTrait for #enum_name {
@@ -185,64 +214,64 @@ pub fn expand_derive_choice(mut input: syn::DeriveInput) -> Result<TokenStream, 
     }))
 }
 
-fn parse_choice(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
-    let name = &choice.ident;
-    let renamed = parse_choice_value(ty, choice);
-    let str_name = choice
-        .meta
-        .rename
-        .clone()
-        .unwrap_or_else(|| name.to_string());
-    let i18n_names = parse_i18n(choice.meta.i18n_names.clone());
-    quote::quote! {
-        ::edgecord::application_command::choice::Choice {
-            name: #str_name.to_string(),
-            i18n_names: #i18n_names,
-            value: #renamed,
+fn parse_choice(choice: &Choice) -> proc_macro2::TokenStream {
+    let name = choice.get_name();
+    match choice {
+        Choice::String { meta, ident } => {
+            let value = meta.clone().value.unwrap_or_else(|| ident.to_string());
+            let i18n_names = parse_i18n(meta.i18n_names.clone());
+            quote::quote! {
+                ::edgecord::application_command::choice::Choice {
+                    name: #name.to_string(),
+                    i18n_names: #i18n_names,
+                    value: ::edgecord::application_command::choice::ChoiceValue::String(#value.to_string()),
+                }
+            }
+        }
+        Choice::Integer { meta, .. } => {
+            let value = meta.value;
+            let i18n_names = parse_i18n(meta.i18n_names.clone());
+            quote::quote! {
+                ::edgecord::application_command::choice::Choice {
+                    name: #name.to_string(),
+                    i18n_names: #i18n_names,
+                    value: ::edgecord::application_command::choice::ChoiceValue::Integer(#value),
+                }
+            }
+        }
+        Choice::Float { meta, .. } => {
+            let value = meta.value;
+            let i18n_names = parse_i18n(meta.i18n_names.clone());
+            quote::quote! {
+                ::edgecord::application_command::choice::Choice {
+                    name: #name.to_string(),
+                    i18n_names: #i18n_names,
+                    value: ::edgecord::application_command::choice::ChoiceValue::Float(#value),
+                }
+            }
         }
     }
 }
 
-fn parse_choice_matches(
-    enum_name: &Ident,
-    ty: &ChoiceType,
-    choice: &Choice,
-) -> proc_macro2::TokenStream {
-    let value = parse_choice_raw_value(ty, choice);
-    let name = &choice.ident;
-    quote::quote! {
-        #value => Ok(#enum_name::#name)
-    }
-}
-
-fn parse_choice_value(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
-    let v = choice.value.clone();
-    match ty {
-        ChoiceType::String => {
-            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v.to_string()) }
+fn parse_choice_matches(enum_name: &Ident, choice: &Choice) -> proc_macro2::TokenStream {
+    match choice {
+        Choice::String { meta, ident } => {
+            let value = meta.clone().value.unwrap_or_else(|| ident.to_string());
+            quote::quote! {
+                #value => Ok(#enum_name::#ident)
+            }
         }
-        ChoiceType::Float => {
-            let v = v.parse::<f32>().unwrap();
-            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v) }
+        Choice::Integer { meta, ident } => {
+            let value = meta.value;
+            quote::quote! {
+                #value => Ok(#enum_name::#ident)
+            }
         }
-        ChoiceType::Integer => {
-            let v = v.parse::<i32>().unwrap();
-            quote::quote! { ::edgecord::application_command::choice::ChoiceValue::from(#v) }
-        }
-    }
-}
-
-fn parse_choice_raw_value(ty: &ChoiceType, choice: &Choice) -> proc_macro2::TokenStream {
-    let v = choice.value.clone();
-    match ty {
-        ChoiceType::String => quote::quote! { #v },
-        ChoiceType::Float => {
-            let v = v.parse::<f64>().unwrap();
-            quote::quote! { #v }
-        }
-        ChoiceType::Integer => {
-            let v = v.parse::<i64>().unwrap();
-            quote::quote! { #v }
+        Choice::Float { meta, ident } => {
+            let value = meta.value;
+            quote::quote! {
+                #value => Ok(#enum_name::#ident)
+            }
         }
     }
 }
