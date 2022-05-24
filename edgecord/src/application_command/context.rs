@@ -1,10 +1,10 @@
 use crate::application_command::i18n::Locales;
 use crate::application_command::FromCommandOptionValue;
+use crate::builder::InteractionResponseBuilder;
 use crate::http::HttpClient;
 use crate::InteractionResponse;
 use twilight_model::application::interaction::ApplicationCommand;
-use twilight_model::channel::message::MessageFlags;
-use twilight_model::http::interaction::{InteractionResponseData, InteractionResponseType};
+use twilight_model::http::interaction::InteractionResponseType;
 use worker::Env;
 
 /**
@@ -51,21 +51,12 @@ impl ChatInputCommandContext {
         .unwrap()
     }
 
-    pub fn message(&self, message: &str) -> InteractionResponse {
-        worker::Response::from_json(&twilight_model::http::interaction::InteractionResponse {
-            kind: InteractionResponseType::ChannelMessageWithSource,
-            data: Some(InteractionResponseData {
-                allowed_mentions: None,
-                attachments: None,
-                choices: None,
-                components: None,
-                content: Some(message.to_string()),
-                custom_id: None,
-                embeds: None,
-                flags: Some(MessageFlags::EPHEMERAL),
-                title: None,
-                tts: None,
-            }),
-        })
+    pub fn message<F>(&self, message: F) -> InteractionResponse
+    where
+        F: FnOnce(&mut InteractionResponseBuilder) -> &mut InteractionResponseBuilder,
+    {
+        let mut builder = InteractionResponseBuilder::default();
+        message(&mut builder);
+        builder.build(InteractionResponseType::ChannelMessageWithSource)
     }
 }

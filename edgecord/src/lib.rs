@@ -22,5 +22,5 @@ pub use edgecord_macros::*;
 
 pub use error::Error;
 
-pub type InteractionResponse = worker::Result<worker::Response>;
+pub type InteractionResponse = twilight_model::http::interaction::InteractionResponse;
 pub type Result<T> = std::result::Result<T, Error>;

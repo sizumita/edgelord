@@ -42,15 +42,15 @@ fn animals() -> Vec<SubCommand> {
 
 #[command(name = "cat", description = "show cat emoji")]
 async fn cat_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
-    ctx.message("🐱")
+    ctx.message(|msg| msg.content("🐱"))
 }
 
 #[command(name = "dog", description = "show dog emoji")]
 async fn dog_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
-    ctx.message("🐶")
+    ctx.message(|msg| msg.content("🐶"))
 }
 
 #[command(name = "human", description = "show human emoji")]
 async fn human_emoji(ctx: ChatInputCommandContext) -> InteractionResponse {
-    ctx.message("👶")
+    ctx.message(|msg| msg.content("👶"))
 }

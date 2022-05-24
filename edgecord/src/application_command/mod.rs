@@ -26,7 +26,7 @@ type AsyncCommandFn = Rc<
             ChatInputCommandContext,
             Box<ApplicationCommand>,
             Vec<CommandDataOption>,
-        ) -> LocalBoxFuture<'static, worker::Result<worker::Response>>,
+        ) -> LocalBoxFuture<'static, InteractionResponse>,
 >;
 
 fn serialize_permissions<S: serde::Serializer>(
@@ -100,8 +100,8 @@ impl Command {
         ctx: ChatInputCommandContext,
         interaction: Box<ApplicationCommand>,
         options: Vec<CommandDataOption>,
-    ) -> InteractionResponse {
-        (self.action)(ctx, interaction, options).await
+    ) -> worker::Result<worker::Response> {
+        worker::Response::from_json(&(self.action)(ctx, interaction, options).await)
     }
 }
 

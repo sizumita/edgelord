@@ -1,6 +1,7 @@
 use edgecord::application_command::i18n::Locales;
 use edgecord::application_command::ChatInputCommandContext;
 use edgecord::handler::InteractionHandler;
+use edgecord::model::channel::message::MessageFlags;
 use edgecord::{command, Choiceable, InteractionResponse};
 use std::collections::HashMap;
 use worker::*;
@@ -38,7 +39,11 @@ fn names() -> HashMap<Locales, String> {
     default_permissions(manage_roles, manage_webhooks)
 )]
 pub async fn help_command(ctx: ChatInputCommandContext) -> InteractionResponse {
-    ctx.message("this is what you want")
+    ctx.message(|message| {
+        message
+            .content("this is what you want")
+            .flag(MessageFlags::EPHEMERAL)
+    })
 }
 
 #[command(name = "animal", description = "show animal image")]
@@ -48,8 +53,12 @@ pub async fn animal_image(
     #[option(description = "image count", max_value = 32)] count: Option<i64>,
 ) -> InteractionResponse {
     match name {
-        Animals::Cat => ctx.message(&*"cat image".repeat(count.unwrap_or(1) as usize)),
-        Animals::Dog => ctx.message(&*"dog image".repeat(count.unwrap_or(1) as usize)),
+        Animals::Cat => {
+            ctx.message(|msg| msg.content("cat image".repeat(count.unwrap_or(1) as usize)))
+        }
+        Animals::Dog => {
+            ctx.message(|msg| msg.content("dog image".repeat(count.unwrap_or(1) as usize)))
+        }
     }
 }
 
