@@ -1,0 +1,12 @@
+name = "e3_discord_defer_command_bot"
+workers_dev = true
+compatibility_date = "2022-05-26"
+main = "build/worker/shim.mjs"
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+# [secrets]
+# DISCORD_BOT_TOKEN
+# APPLICATION_ID
+# APPLICATION_PUBLIC_KEY

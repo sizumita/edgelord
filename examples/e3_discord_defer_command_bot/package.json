@@ -1,0 +1,6 @@
+{
+  "version": "3",
+  "devDependencies": {
+    "wrangler": "~2.0.5"
+  }
+}

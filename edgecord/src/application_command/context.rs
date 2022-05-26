@@ -3,6 +3,7 @@ use crate::application_command::FromCommandOptionValue;
 use crate::builder::InteractionResponseBuilder;
 use crate::http::HttpClient;
 use crate::InteractionResponse;
+use std::future::Future;
 use twilight_model::application::interaction::ApplicationCommand;
 use twilight_model::http::interaction::InteractionResponseType;
 use worker::Env;
@@ -58,5 +59,25 @@ impl ChatInputCommandContext {
         let mut builder = InteractionResponseBuilder::default();
         message(&mut builder);
         builder.build(InteractionResponseType::ChannelMessageWithSource)
+    }
+
+    pub fn defer<F>(&self, message: F) -> InteractionResponse
+    where
+        F: FnOnce(&mut InteractionResponseBuilder) -> &mut InteractionResponseBuilder,
+    {
+        let mut builder = InteractionResponseBuilder::default();
+        message(&mut builder);
+        builder.build(InteractionResponseType::DeferredChannelMessageWithSource)
+    }
+
+    pub fn defer_and<F, M>(&self, future: F, message: M) -> InteractionResponse
+    where
+        F: Future<Output = ()> + 'static,
+        M: FnOnce(&mut InteractionResponseBuilder) -> &mut InteractionResponseBuilder,
+    {
+        let mut builder = InteractionResponseBuilder::default();
+        message(&mut builder);
+        self.ctx.wait_until(future);
+        builder.build(InteractionResponseType::DeferredChannelMessageWithSource)
     }
 }
