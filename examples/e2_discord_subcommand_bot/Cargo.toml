@@ -10,7 +10,7 @@ crate-type = ["cdylib", "rlib"]
 worker = "0.0.9"
 serde = {version = "1.0.137", features = ["derive"]}
 
-edgecord = { path = "../../edgecord"}
+edgecord = { path = "../../edgecord", features = ["local"]}
 edgelord = { path = "../../edgelord"}
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

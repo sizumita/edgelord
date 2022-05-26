@@ -11,11 +11,11 @@ use serde::Serialize;
 use worker::Method;
 
 cfg_if! {
-    if #[cfg(target_arch = "wasm32")] {
+    if #[cfg(all(not(target_arch = "wasm32"), feature = "local"))] {
+        use std::str::FromStr;
+    } else {
         use worker::wasm_bindgen::JsValue;
         use edgelord::http::RequestBuilder;
-    } else {
-        use std::str::FromStr;
     }
 }
 
@@ -71,7 +71,7 @@ impl HttpClient {
         }
     }
 
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(not(target_arch = "wasm32"), feature = "local"))]
     pub async fn request<T, B>(
         &self,
         method: Method,

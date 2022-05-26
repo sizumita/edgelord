@@ -1,8 +1,8 @@
 use edgecord::application_command::ChatInputCommandContext;
 use edgecord::handler::InteractionHandler;
+use edgecord::model::channel::message::MessageFlags;
 use edgecord::{command, InteractionResponse};
 use worker::*;
-use edgecord::model::channel::message::MessageFlags;
 
 #[event(fetch)]
 pub async fn fetch(req: Request, env: Env, worker_context: worker::Context) -> Result<Response> {

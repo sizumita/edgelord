@@ -10,6 +10,11 @@ repository = "https://github.com/sizumita/edgelord"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+default = []
+local = ["reqwest"]
+
+
 [dependencies]
 worker = "0.0.9"
 edgelord = { path = "../edgelord" }
@@ -25,4 +30,4 @@ cfg-if = "1.0.0"
 url = "2.2.2"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { version = "0.11.10", features = ["json"]}
+reqwest = { version = "0.11.10", features = ["json"], optional = true}
