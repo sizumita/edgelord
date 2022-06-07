@@ -1,8 +1,7 @@
+use serde::Serialize;
 use twilight_model::application::component::Component;
 use twilight_model::channel::embed::Embed;
 use twilight_model::channel::message::{AllowedMentions, MessageFlags};
-use serde::Serialize;
-
 
 #[derive(Debug, Clone, Serialize)]
 pub struct WebhookBody {

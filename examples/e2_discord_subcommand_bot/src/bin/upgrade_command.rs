@@ -12,7 +12,7 @@ use worker::Method;
 async fn main() {
     let client = HttpClient::new(
         std::env::var("DISCORD_BOT_TOKEN").unwrap().as_str(),
-        Id::from_str(&*std::env::var("APPLICATION_ID").unwrap()).unwrap()
+        Id::from_str(&*std::env::var("APPLICATION_ID").unwrap()).unwrap(),
     );
     let result = client
         .request::<Vec<CommandGroup>, Vec<Command>>(

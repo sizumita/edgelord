@@ -5,8 +5,8 @@ use ed25519_dalek::{PublicKey, Signature, Verifier};
 use twilight_model::application::interaction::application_command::CommandDataOption;
 use twilight_model::application::interaction::{ApplicationCommand, Interaction};
 use twilight_model::http::interaction::{InteractionResponse, InteractionResponseType};
-use twilight_model::id::Id;
 use twilight_model::id::marker::ApplicationMarker;
+use twilight_model::id::Id;
 use worker::{console_error, Response};
 
 /**
@@ -18,7 +18,7 @@ pub struct InteractionHandler {
     pub groups: Vec<CommandGroup>,
     pub public_key: PublicKey,
     pub token: String,
-    pub application_id: Id<ApplicationMarker>
+    pub application_id: Id<ApplicationMarker>,
 }
 
 impl InteractionHandler {

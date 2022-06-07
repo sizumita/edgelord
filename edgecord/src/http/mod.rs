@@ -1,16 +1,16 @@
 mod bucket;
-mod route;
 pub mod guild;
 pub mod interaction;
+mod route;
 
 use cfg_if::cfg_if;
 pub use route::Routes;
 
 use crate::Error;
 use serde::de::DeserializeOwned;
-use serde::{Serialize};
-use twilight_model::id::Id;
+use serde::Serialize;
 use twilight_model::id::marker::ApplicationMarker;
+use twilight_model::id::Id;
 use worker::Method;
 
 cfg_if! {
@@ -106,7 +106,7 @@ impl HttpClient {
 
         if response.status().clone().is_success() {
             if response.status().as_u16() == 204 {
-                return Ok(None)
+                return Ok(None);
             }
             return Ok(Some(response.json::<T>().await.unwrap()));
         }
