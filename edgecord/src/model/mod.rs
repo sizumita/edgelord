@@ -1,3 +1,5 @@
+pub mod rest;
+
 use std::fmt::{Display, Formatter};
 pub use twilight_model::*;
 

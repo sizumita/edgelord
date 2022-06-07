@@ -1,6 +1,8 @@
+use std::str::FromStr;
 use crate::application_command::{Command, CommandGroup};
 use crate::handler::InteractionHandler;
 use ed25519_dalek::PublicKey;
+use twilight_model::id::Id;
 
 /**
 A builder for [`InteractionHandler`].
@@ -74,6 +76,7 @@ impl CommandHandlerBuilder {
                 self.public_key.clone().unwrap().as_bytes(),
             )?)?,
             token: self.token.clone().unwrap_or_default(),
+            application_id: Id::from_str(&*self.application_id.clone().unwrap_or_default()).unwrap(),
         })
     }
 }

@@ -1,13 +1,16 @@
 mod bucket;
 mod route;
+pub mod guild;
+pub mod interaction;
 
 use cfg_if::cfg_if;
 pub use route::Routes;
 
-use crate::http::bucket::DefaultRateLimitBucket;
 use crate::Error;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
+use serde::{Serialize};
+use twilight_model::id::Id;
+use twilight_model::id::marker::ApplicationMarker;
 use worker::Method;
 
 cfg_if! {
@@ -19,9 +22,10 @@ cfg_if! {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct HttpClient {
     token: String,
-    _bucket: Box<dyn bucket::RateLimitBucket>,
+    application_id: Id<ApplicationMarker>,
     ua: String,
     #[cfg(not(target_arch = "wasm32"))]
     _http: reqwest::Client,
@@ -31,10 +35,10 @@ pub struct HttpClient {
 const BASE_URL: &str = "https://discord.com/api/v10";
 
 impl HttpClient {
-    pub fn new(token: &str) -> Self {
+    pub fn new(token: &str, application_id: Id<ApplicationMarker>) -> Self {
         Self {
             token: format!("Bot {token}"),
-            _bucket: Box::new(DefaultRateLimitBucket {}),
+            application_id,
             ua: "Discord Bot (https://github.com/sizumita/edgelord 0.0.1)".to_string(),
             #[cfg(not(target_arch = "wasm32"))]
             _http: reqwest::Client::new(),
@@ -42,12 +46,12 @@ impl HttpClient {
     }
 
     #[cfg(target_arch = "wasm32")]
-    pub async fn request<T, B>(
+    pub async fn request<B, T>(
         &self,
         method: Method,
         route: Routes,
         body: Option<B>,
-    ) -> crate::Result<T>
+    ) -> crate::Result<Option<T>>
     where
         T: DeserializeOwned,
         B: Serialize,
@@ -63,7 +67,8 @@ impl HttpClient {
             .unwrap();
 
         match response.status_code() {
-            i if i < 399 => Ok(response.json::<T>().await.unwrap()),
+            204 => Ok(None),
+            i if i < 399 => Ok(Some(response.json::<T>().await.unwrap())),
             403 => Err(Error::Forbidden),
             404 => Err(Error::NotFound),
             // TODO: add errors
@@ -72,12 +77,12 @@ impl HttpClient {
     }
 
     #[cfg(all(not(target_arch = "wasm32"), feature = "local"))]
-    pub async fn request<T, B>(
+    pub async fn request<B, T>(
         &self,
         method: Method,
         route: Routes,
         body: Option<B>,
-    ) -> crate::Result<T>
+    ) -> crate::Result<Option<T>>
     where
         T: DeserializeOwned,
         B: Serialize,
@@ -100,7 +105,10 @@ impl HttpClient {
             .unwrap();
 
         if response.status().clone().is_success() {
-            return Ok(response.json::<T>().await.unwrap());
+            if response.status().as_u16() == 204 {
+                return Ok(None)
+            }
+            return Ok(Some(response.json::<T>().await.unwrap()));
         }
         match response.status() {
             reqwest::StatusCode::FORBIDDEN => Err(Error::Forbidden),

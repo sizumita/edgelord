@@ -10,9 +10,12 @@ use worker::Method;
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]
 async fn main() {
-    let client = HttpClient::new(std::env::var("DISCORD_BOT_TOKEN").unwrap().as_str());
+    let client = HttpClient::new(
+        std::env::var("DISCORD_BOT_TOKEN").unwrap().as_str(),
+        Id::from_str(&*std::env::var("APPLICATION_ID").unwrap()).unwrap()
+    );
     let result = client
-        .request::<Vec<Command>, Vec<CommandGroup>>(
+        .request::<Vec<CommandGroup>, Vec<Command>>(
             Method::Put,
             Routes::ApplicationGuildCommands(
                 Id::from_str(std::env::var("APPLICATION_ID").unwrap().as_str()).unwrap(),
